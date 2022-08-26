@@ -11,7 +11,7 @@ Please see the [MET website](https://dtcenter.org/community-code/model-evaluatio
 ### NOTE: Replace X.Y with the major and minor release numbers in the command below.
 
 ```
-docker build -t dtcenter/met-base:minimum_vX.Y -f Dockerfile.minimum .
+docker build -t dtcenter/met-base:minimum_vX.Y -f Dockerfile .
 docker push dtcenter/met-base:minimum
 ```
 
