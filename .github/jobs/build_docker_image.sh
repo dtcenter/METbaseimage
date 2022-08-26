@@ -7,7 +7,7 @@ DOCKERHUB_TAG_MIN=${DOCKERHUB_REPO}:${MET_BASE_IMAGE}
 
 DOCKERFILE_PATH=${GITHUB_WORKSPACE}/Dockerfile
 
-CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build.log
+CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build_base_image.log
 
 time_command docker build -t ${DOCKERHUB_TAG_MIN} \
     -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}
@@ -20,10 +20,10 @@ DOCKERHUB_TAG_TEST=${DOCKERHUB_REPO}:unit_test_${GITHUB_TAG}
 
 DOCKERFILE_PATH=${GITHUB_WORKSPACE}/Dockerfile.unit_test_env
 
-CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build.log
+CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build_unit_test_env.log
 
 time_command docker build -t ${DOCKERHUB_TAG_TEST} \
-    --build-arg MET_BASE_IMAGE \
+    --build-arg MET_BASE_IMAGE=${MET_BASE_IMAGE} \
     -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}
 if [ $? != 0 ]; then
   cat ${GITHUB_WORKSPACE}/docker_build_unit_test_env.log
