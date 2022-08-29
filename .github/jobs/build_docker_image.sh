@@ -9,7 +9,7 @@ DOCKERFILE_PATH=${GITHUB_WORKSPACE}/Dockerfile
 
 CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build_base_image.log
 
-time_command docker build -t ${DOCKERHUB_TAG_MIN} \
+time_command docker build -t ${DOCKERHUB_TAG_BASE} \
     -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}
 if [ $? != 0 ]; then
   cat ${GITHUB_WORKSPACE}/docker_build_base_image.log
