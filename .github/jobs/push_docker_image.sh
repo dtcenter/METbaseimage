@@ -2,8 +2,9 @@
 
 source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
 
-DOCKERHUB_TAG_MIN=${DOCKERHUB_REPO}:minimum_${GITHUB_TAG}
-DOCKERHUB_TAG_TEST=${DOCKERHUB_REPO}:unit_test_${GITHUB_TAG}
+DOCKERHUB_TAG_BASE=${DOCKERHUB_BASE_REPO}:${GITHUB_TAG}
+
+DOCKERHUB_TAG_UNIT_TEST=${DOCKERHUB_UNIT_TEST_REPO}:${GITHUB_TAG}
 
 
 # skip docker push if credentials are not set
@@ -14,8 +15,8 @@ fi
 
 echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
 
-time_command docker push ${DOCKERHUB_TAG_MIN}
+time_command docker push ${DOCKERHUB_TAG_BASE}
 if [ $? != 0 ]; then
   exit 1
 fi
-time_command docker push ${DOCKERHUB_TAG_TEST}
+time_command docker push ${DOCKERHUB_TAG_UNIT_TEST}

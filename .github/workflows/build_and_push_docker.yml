@@ -6,7 +6,8 @@ on:
       - v*
       
 env:
-  DOCKERHUB_REPO: dtcenter/met-base
+  DOCKERHUB_BASE_REPO: dtcenter/met-base
+  DOCKERHUB_UNIT_TEST_REPO: dtcenter/met-base-unit-test
 
 jobs:
 
