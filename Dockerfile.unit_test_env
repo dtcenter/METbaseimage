@@ -1,7 +1,6 @@
-ARG MET_BASE_UNIT_TEST_IMAGE
+ARG MET_BASE_IMAGE
 
-#FROM dtcenter/met-base-unit-test:${MET_BASE_UNIT_TEST_IMAGE}
-FROM dtcenter/met-base-unit-test
+FROM dtcenter/met-base:${MET_BASE_IMAGE}
 
 MAINTAINER John Halley Gotway <johnhg@ucar.edu>
 
