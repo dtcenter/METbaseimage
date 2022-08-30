@@ -1,0 +1,36 @@
+name: Build Docker Images
+
+on:
+  push:
+    tags:
+      - v*
+      
+env:
+  DOCKERHUB_BASE_REPO: dtcenter/met-base
+  DOCKERHUB_UNIT_TEST_REPO: dtcenter/met-base-unit-test
+
+jobs:
+
+  handle_docker_images:
+    name: Handle Docker Images
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Get tag name
+        id: get_tag_name
+        run: echo ::set-output name=tag_name::${GITHUB_REF#"refs/tags/"}
+
+      - name: Build Docker Image
+        run: .github/jobs/build_docker_image.sh
+        env:
+          GITHUB_TAG: ${{ steps.get_tag_name.outputs.tag_name }}
+
+      - name: Push Docker Image
+        run: .github/jobs/push_docker_image.sh
+        env:
+          GITHUB_TAG: ${{ steps.get_tag_name.outputs.tag_name }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+
