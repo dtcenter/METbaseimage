@@ -34,7 +34,7 @@ RUN yum -y update \
  && yum -y install gv ncview wgrib wgrib2 ImageMagick ps2pdf \
  && yum -y install python3 python3-devel python3-pip \
  && pip3 install --upgrade pip \
- && python3 -m pip install numpy xarray netCDF4
+ && python3 -m pip install numpy xarray netCDF4==1.5.8
 
 #
 # Set the working directory.
