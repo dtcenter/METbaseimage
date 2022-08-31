@@ -18,9 +18,9 @@ docker build -t dtcenter/met-base .
 2. `Dockerfile.unit_test_env` extends the `dtcenter/met-base` image by adding packages required for running the MET unit tests. Tagged versions are available in the [dtcenter/met-base-unit-test](https://hub.docker.com/repository/docker/dtcenter/met-base-unit-test) DockerHub repository. It can be built manually by running:
 ```
 docker build -t dtcenter/met-base-unit-test \
-  --build-arg MET_BASE_IMAGE=${MET_BASE_IMAGE} \
+  --build-arg MET_BASE_TAG=${MET_BASE_TAG} \
   -f Dockerfile.unit_test_env .
 ```
 
 where:
-* `${MET_BASE_IMAGE}` is the version of [dtcenter/met-base](https://hub.docker.com/repository/docker/dtcenter/met-base) to be used
+* `${MET_BASE_TAG}` is the version of [dtcenter/met-base](https://hub.docker.com/repository/docker/dtcenter/met-base) to be used
