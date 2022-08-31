@@ -1,9 +1,9 @@
 #! /bin/bash                                                                                                                                                    
 source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
 
-MET_BASE_IMAGE=${GITHUB_TAG}
+MET_BASE_TAG=${GITHUB_TAG}
 
-DOCKERHUB_TAG_BASE=${DOCKERHUB_BASE_REPO}:${MET_BASE_IMAGE}
+DOCKERHUB_TAG_BASE=${DOCKERHUB_BASE_REPO}:${MET_BASE_TAG}
 
 DOCKERFILE_PATH=${GITHUB_WORKSPACE}/Dockerfile
 
@@ -23,7 +23,7 @@ DOCKERFILE_PATH=${GITHUB_WORKSPACE}/Dockerfile.unit_test_env
 CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build_unit_test_env.log
 
 time_command docker build -t ${DOCKERHUB_TAG_UNIT_TEST} \
-    --build-arg MET_BASE_IMAGE=${MET_BASE_IMAGE} \
+    --build-arg MET_BASE_TAG=${MET_BASE_TAG} \
     -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}
 if [ $? != 0 ]; then
   cat ${GITHUB_WORKSPACE}/docker_build_unit_test_env.log
