@@ -31,7 +31,7 @@ RUN yum -y update \
                    hostname m4 make tar tcsh ksh time wget which \
                    flex flex-devel bison bison-devel unzip \
  && yum -y install git g2clib-devel hdf5-devel.x86_64 gsl-devel \
- && yum -y install gv ncview wgrib wgrib2 ImageMagick ps2pdf \
+ && yum -y install gv ncview wgrib wgrib2 ImageMagick ps2pdf sqlite-devel \
  && yum -y install wget make gcc openssl-devel bzip2-devel libffi-devel\
  && cd tmp \
  && wget https://www.python.org/ftp/python/3.8.6/Python-3.8.6.tgz \
