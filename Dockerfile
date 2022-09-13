@@ -37,14 +37,12 @@ RUN yum -y update \
  && wget https://www.python.org/ftp/python/3.8.6/Python-3.8.6.tgz \
  && tar xzf Python-3.8.6.tgz \
  && cd Python-3.8.6 \
- && ./configure --enable-optimizations \
+ && ./configure --enable-optimizations --enable-shared \
  && make altinstall \
  && ln -sfn /usr/local/bin/python3.8 /usr/bin/python3.8 \
  && ln -sfn /usr/local/bin/pip3.8 /usr/bin/pip3.8 \
  && ln -sfn /usr/local/bin/python3.8 /usr/bin/python3 \
  && ln -sfn /usr/local/bin/pip3.8 /usr/bin/pip3
-
-ENV LD_LIBRARY_PATH /usr/local/lib
 
 RUN pip3 install --upgrade pip \
  && python3 -m pip install numpy xarray netCDF4
@@ -62,10 +60,8 @@ RUN echo export MET_BASE=/usr/local/share/met >> /etc/bashrc \
  && echo export MET_FONT_DIR=/usr/local/share/met/fonts >> /etc/bashrc \
  && echo setenv MET_FONT_DIR /usr/local/share/met/fonts >> /etc/csh.cshrc \
  && echo export RSCRIPTS_BASE=/usr/local/share/met/Rscripts >> /etc/bashrc \
- && echo setenv RSCRIPTS_BASE /usr/local/share/met/Rscripts >> /etc/csh.cshrc \
- && echo export LD_LIBRARY_PATH=/usr/local/lib >> /etc/bashrc \
- && echo setenv LD_LIBRARY_PATH /usr/local/lib >> /etc/csh.cshrc
-ENV LD_LIBRARY_PATH /usr/local/lib
+ && echo setenv RSCRIPTS_BASE /usr/local/share/met/Rscripts >> /etc/csh.cshrc
+
 ENV MET_FONT_DIR /usr/local/share/met/fonts
 
 #
