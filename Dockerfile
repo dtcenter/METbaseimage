@@ -44,6 +44,9 @@ RUN yum -y update \
  && ln -sfn /usr/local/bin/python3.8 /usr/bin/python3 \
  && ln -sfn /usr/local/bin/pip3.8 /usr/bin/pip3
 
+# needed to prevent error in subsequent pip command
+ENV LD_LIBRARY_PATH /usr/local/lib
+
 RUN pip3 install --upgrade pip \
  && python3 -m pip install numpy xarray netCDF4
 
