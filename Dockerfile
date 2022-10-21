@@ -46,9 +46,9 @@ RUN cd tmp \
  && ln -sfn /usr/local/bin/python3.8 /usr/bin/python3.8 \
  && ln -sfn /usr/local/bin/pip3.8 /usr/bin/pip3.8 \
  && ln -sfn /usr/local/bin/python3.8 /usr/bin/python3 \
- && ln -sfn /usr/local/bin/pip3.8 /usr/bin/pip3 \
- && unlink /usr/bin/python \
- && ln -sfn /usr/bin/python3 /usr/bin/python
+ && ln -sfn /usr/local/bin/pip3.8 /usr/bin/pip3 
+# && unlink /usr/bin/python \
+# && ln -sfn /usr/bin/python3 /usr/bin/python
 
 # needed to prevent error in subsequent pip command 
 ENV LD_LIBRARY_PATH /usr/local/lib
