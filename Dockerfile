@@ -32,12 +32,8 @@ RUN yum -y update \
                    flex flex-devel bison bison-devel unzip \
  && yum -y install git g2clib-devel hdf5-devel.x86_64 gsl-devel \
  && yum -y install gv ncview wgrib wgrib2 ImageMagick ps2pdf sqlite-devel \
- && yum -y install wget make gcc openssl-devel bzip2-devel libffi-devel
-
-#
-# Install Python-3.8.6
-#
-RUN cd tmp \
+ && yum -y install wget make gcc openssl-devel bzip2-devel libffi-devel \
+ && cd tmp \
  && wget https://www.python.org/ftp/python/3.8.6/Python-3.8.6.tgz \
  && tar xzf Python-3.8.6.tgz \
  && cd Python-3.8.6 \
@@ -47,9 +43,6 @@ RUN cd tmp \
  && ln -sfn /usr/local/bin/pip3.8 /usr/bin/pip3.8 \
  && ln -sfn /usr/local/bin/python3.8 /usr/bin/python3 \
  && ln -sfn /usr/local/bin/pip3.8 /usr/bin/pip3 \
- && cd /usr/bin \
- && unlink python \
- && ln -sfn python3 python
 
 # needed to prevent error in subsequent pip command 
 ENV LD_LIBRARY_PATH /usr/local/lib
