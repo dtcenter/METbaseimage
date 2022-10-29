@@ -10,13 +10,22 @@ ENV FC  /usr/bin/gfortran
 ENV F77 /usr/bin/gfortran
 
 #
+# Define library versions.
+# Match WCOSS2 versions as of October, 2022.
+#
+ENV HDF5_VER       1_10_6
+ENV NETCDF4C_VER   4.7.4
+ENV NETCDF4CXX_VER 4.3.1
+
+#
 # Define package URL's.
 #
 ENV HDF4_URL       http://www.hdfgroup.org/ftp/HDF/releases/HDF4.2r3/src/HDF4.2r3.tar.gz
 ENV HDFEOS_URL     https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/HDF-EOS2.16v1.00.tar.Z
 
-ENV NETCDF4C_URL   https://github.com/Unidata/netcdf-c/archive/v4.4.1.1.zip
-ENV NETCDF4CXX_URL https://github.com/Unidata/netcdf-cxx4/archive/v4.3.0.tar.gz
+ENV HDF5_URL       https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-${HDF5_VER}.zip
+ENV NETCDF4C_URL   https://github.com/Unidata/netcdf-c/archive/refs/tags/v${NETCDF4C_VER}.zip
+ENV NETCDF4CXX_URL https://github.com/Unidata/netcdf-cxx4/archive/v${NETCDF4CXX_VER}.tar.gz
 
 ENV BUFRLIB_URL    https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/BUFRLIB_v10-2-3.tar
 ENV GSFONT_URL     https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/ghostscript-fonts-std-8.11.tar.gz
@@ -30,9 +39,10 @@ RUN yum -y update \
                    cairo-devel freetype-devel epel-release \
                    hostname m4 make tar tcsh ksh time wget which \
                    flex flex-devel bison bison-devel unzip \
- && yum -y install git g2clib-devel hdf5-devel.x86_64 gsl-devel \
+ && yum -y install git g2clib-devel gsl-devel \
  && yum -y install gv ncview wgrib wgrib2 ImageMagick ps2pdf sqlite-devel \
  && yum -y install wget make gcc openssl-devel bzip2-devel libffi-devel \
+ && yum -y install libcurl-devel.x86_64 \
  && cd tmp \
  && wget https://www.python.org/ftp/python/3.8.6/Python-3.8.6.tgz \
  && tar xzf Python-3.8.6.tgz \
@@ -89,30 +99,50 @@ RUN mkdir -p /met/logs \
  && rm -rf BUFRLIB
 
 #
+# Download and install HDF5.
+#
+RUN mkdir -p /met/external_libs/hdf5 \
+ && cd /met/external_libs/hdf5 \
+ && echo "Downloading HDF5 from ${HDF5_URL}" \
+ && wget ${HDF5_URL} \
+ && unzip hdf5-${HDF5_VER}.zip \
+ && cd hdf5-hdf5-${HDF5_VER} \
+ && LOG_FILE=/met/logs/hdf5-hdf5-${HDF5_VER}_configure.log \
+ && echo "Configuring hdf5-hdf5-${HDF5_VER} and writing log file ${LOG_FILE}" \
+ && ./configure --prefix=/usr/local --enable-cxx --with-default-api-version=v18 > ${LOG_FILE} \
+ && LOG_FILE=/met/logs/hdf5-hdf5-${HDF5_VER}_make_install.log \
+ && echo "Compiling hdf5-hdf5-${HDF5_VER} and writing log file ${LOG_FILE}" \
+ && make install > ${LOG_FILE} \
+ && cd /met/external_libs
+
+
+# && rm -rf hdf5
+
+#
 # Download and install NetCDF4 (C and C++).
 #
 RUN mkdir -p /met/external_libs/netcdf \
  && cd /met/external_libs/netcdf \
- && echo "Downloading netcdf-c-4.4.1.1 from ${NETCDF4C_URL}" \
+ && echo "Downloading netcdf-c-${NETCDF4C_VER} from ${NETCDF4C_URL}" \
  && wget ${NETCDF4C_URL} \
- && unzip v4.4.1.1.zip \
- && cd netcdf-c-4.4.1.1 \
- && LOG_FILE=/met/logs/netcdf-c-4.4.1.1_configure.log \
- && echo "Configuring netcdf-c-4.4.1.1 and writing log file ${LOG_FILE}" \
- && ./configure > ${LOG_FILE} \
- && LOG_FILE=/met/logs/netcdf-c-4.4.1.1_make_install.log \
- && echo "Compiling netcdf-c-4.4.1.1 and writing log file ${LOG_FILE}" \
+ && unzip v${NETCDF4C_VER}.zip \
+ && cd netcdf-c-${NETCDF4C_VER} \
+ && LOG_FILE=/met/logs/netcdf-c-${NETCDF4C_VER}_configure.log \
+ && echo "Configuring netcdf-c-${NETCDF4C_VER} and writing log file ${LOG_FILE}" \
+ && ./configure --enable-shared --enable-netcdf-4 > ${LOG_FILE} \
+ && LOG_FILE=/met/logs/netcdf-c-${NETCDF4C_VER}_make_install.log \
+ && echo "Compiling netcdf-c-${NETCDF4C_VER} and writing log file ${LOG_FILE}" \
  && make install > ${LOG_FILE} \
  && echo "Downloading  from ${NETCDF4CXX_URL}" \
  && cd /met/external_libs/netcdf \
  && wget ${NETCDF4CXX_URL} \
- && tar -xzf v4.3.0.tar.gz \
- && cd netcdf-cxx4-4.3.0 \
- && LOG_FILE=/met/logs/netcdf-cxx4-4.3.0_configure.log \
- && echo "Configuring netcdf-cxx4-4.3.0 and writing log file ${LOG_FILE}" \
+ && tar -xzf v${NETCDF4CXX_VER}.tar.gz \
+ && cd netcdf-cxx4-${NETCDF4CXX_VER} \
+ && LOG_FILE=/met/logs/netcdf-cxx4-${NETCDF4CXX_VER}_configure.log \
+ && echo "Configuring netcdf-cxx4-${NETCDF4CXX_VER} and writing log file ${LOG_FILE}" \
  && ./configure > ${LOG_FILE} \
- && LOG_FILE=/met/logs/netcdf-cxx4-4.3.0_make_install.log \
- && echo "Compiling netcdf-cxx4-4.3.0 and writing log file ${LOG_FILE}" \
+ && LOG_FILE=/met/logs/netcdf-cxx4-${NETCDF4CXX_VER}_make_install.log \
+ && echo "Compiling netcdf-cxx4-${NETCDF4CXX_VER} and writing log file ${LOG_FILE}" \
  && make install > ${LOG_FILE} \
  && cd /met/external_libs \
  && rm -rf netcdf
