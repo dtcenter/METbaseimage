@@ -40,21 +40,11 @@ RUN yum -y update \
                    hostname m4 make tar tcsh ksh time wget which \
                    flex flex-devel bison bison-devel unzip \
  && yum -y install git g2clib-devel gsl-devel \
- && yum -y install gv ncview wgrib wgrib2 ImageMagick ps2pdf sqlite-devel \
- && yum -y install wget make gcc openssl-devel bzip2-devel libffi-devel \
- && yum -y install libcurl-devel.x86_64 \
- && cd tmp \
- && wget https://www.python.org/ftp/python/3.8.6/Python-3.8.6.tgz \
- && tar xzf Python-3.8.6.tgz \
- && cd Python-3.8.6 \
- && ./configure --enable-optimizations --enable-shared \
- && make altinstall \
- && ln -sfn /usr/local/bin/python3.8 /usr/bin/python3.8 \
- && ln -sfn /usr/local/bin/pip3.8 /usr/bin/pip3.8 \
- && ln -sfn /usr/local/bin/python3.8 /usr/bin/python3 \
- && ln -sfn /usr/local/bin/pip3.8 /usr/bin/pip3 
+ && yum -y install sqlite-devel libffi-devel libcurl-devel.x86_64 \
+ && yum -y install gv ncview wgrib wgrib2 ImageMagick ps2pdf \
+ && yum -y install python3 python3-devel python3-pip
 
-# needed to prevent error in subsequent pip command 
+# Needed to prevent error in subsequent pip command 
 ENV LD_LIBRARY_PATH /usr/local/lib
 
 RUN pip3 install --upgrade pip \
