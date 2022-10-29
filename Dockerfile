@@ -113,10 +113,8 @@ RUN mkdir -p /met/external_libs/hdf5 \
  && LOG_FILE=/met/logs/hdf5-hdf5-${HDF5_VER}_make_install.log \
  && echo "Compiling hdf5-hdf5-${HDF5_VER} and writing log file ${LOG_FILE}" \
  && make install > ${LOG_FILE} \
- && cd /met/external_libs
-
-
-# && rm -rf hdf5
+ && cd /met/external_libs \
+ && rm -rf hdf5
 
 #
 # Download and install NetCDF4 (C and C++).
