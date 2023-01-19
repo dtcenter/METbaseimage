@@ -11,6 +11,8 @@ ENV F77 /usr/bin/gfortran
 
 ENV PYTHON_VER 3.10.4
 
+ENV GSFONT_URL     https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/ghostscript-fonts-std-8.11.tar.gz
+
 #
 # Setup the environment for interactive bash/csh container shells.
 #
@@ -53,3 +55,7 @@ RUN wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_file
     && export SKIP_MET=yes \
     && chmod +x compile_MET_all.sh \
     && ./compile_MET_all.sh development.docker
+
+RUN echo "Downloading GhostScript fonts from ${GSFONT_URL} into /usr/local/share/met" \
+ && mkdir -p /usr/local/share/met \
+ && curl -SL ${GSFONT_URL} | tar zxC /usr/local/share/met
