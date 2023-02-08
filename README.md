@@ -13,6 +13,7 @@ GitHub actions are triggered for each new tag created in this repository to auto
 1. `Dockerfile` defines the base compilation environment for MET. Tagged versions are available in the [dtcenter/met-base](https://hub.docker.com/repository/docker/dtcenter/met-base) DockerHub repository. It can be built manually by running:
 ```
 docker build -t dtcenter/met-base:v2.0_debian10 -f Dockerfile.debian .
+docker push dtcenter/met-base:v2.0_debian10
 ```
 
 2. `Dockerfile.unit_test_env` extends the `dtcenter/met-base` image by adding packages required for running the MET unit tests. Tagged versions are available in the [dtcenter/met-base-unit-test](https://hub.docker.com/repository/docker/dtcenter/met-base-unit-test) DockerHub repository. It can be built manually by running:
@@ -21,6 +22,7 @@ export MET_BASE_TAG=v2.0_debian10
 docker build -t dtcenter/met-base-unit-test:v2.0_debian10 \
   --build-arg MET_BASE_TAG \
   -f Dockerfile.debian_unit_test_env .
+docker push dtcenter/met-base-unit-test:v2.0_debian10
 ```
 
 where:

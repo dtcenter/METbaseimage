@@ -20,7 +20,7 @@ RUN echo "Installing tools needed for running MET unit tests..." \
  && apt install -y r-base \
  && echo "Installing R ncdf4 1.21..." \
  && wget https://cran.r-project.org/src/contrib/ncdf4_1.21.tar.gz \
- && R CMD INSTALL --configure-args="--with-nc-config=/met/external_libs/netcdf/netcdf-c-4.7.4/nc-config" ncdf4_1.21.tar.gz \
+ && R CMD INSTALL --configure-args="--with-nc-config=/usr/local/netcdf/netcdf-c-4.7.4/nc-config" ncdf4_1.21.tar.gz \
  && echo "Installing NCO and netcdf-bin (for ncdiff)..." \
  && apt install -y nco netcdf-bin \
  && echo "Finished installing unit test tools"
