@@ -24,6 +24,7 @@ v1.0
 ----
 
 * Initial release
+* Uses centos:7 as base image
 
 How to Use Dockerfiles
 ======================
