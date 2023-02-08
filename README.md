@@ -5,6 +5,26 @@ This repository contains Dockerfiles which define environments for building and 
 
 Please see the [MET website](https://dtcenter.org/community-code/model-evaluation-tools-met) and the [MET User's Guide](https://met.readthedocs.io/en/latest) for more information.  Support	for the	METplus components, including this repository, is provided through the [METplus Discussions](https://github.com/dtcenter/METplus/discussions) forum.  Users are welcome and encouraged to answer or address each other's questions there!  For more information, please read "[Welcome to the METplus Components Discussions](https://github.com/dtcenter/METplus/discussions/939)".
 
+Version History
+===============
+
+v2.0_debian10
+-------------
+
+* Uses debian:10-slim as base image
+* Python 3.10.4
+
+v1.1
+----
+
+* Update NetCDF libraries to support groups (needed for ioda2nc enhancements)
+* Update versions of HDF5 and NetCDF libraries to mirror WCOSS2
+
+v1.0
+----
+
+* Initial release
+
 How to Use Dockerfiles
 ======================
 
