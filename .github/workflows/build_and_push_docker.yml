@@ -19,12 +19,15 @@ jobs:
 
       - name: Get tag name
         id: get_tag_name
-        run: echo ::set-output name=tag_name::${GITHUB_REF#"refs/tags/"}
+        uses: devops-actions/action-get-tag@v1.0.1
+        with:
+          strip_v: false
+          default: v0.0.0
 
       - name: Build Docker Image
         run: .github/jobs/build_docker_image.sh
         env:
-          GITHUB_TAG: ${{ steps.get_tag_name.outputs.tag_name }}
+          GITHUB_TAG: ${{ steps.get_tag_name.outputs.tag }}
 
       - name: Push Docker Image
         run: .github/jobs/push_docker_image.sh
