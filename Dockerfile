@@ -1,5 +1,6 @@
-FROM centos:7
-MAINTAINER John Halley Gotway <johnhg@ucar.edu>
+ARG DEBIAN_VERSION=10
+FROM debian:${DEBIAN_VERSION}-slim
+MAINTAINER George McCabe <mccabe@ucar.edu>
 
 #
 # Define the compilers.
@@ -9,160 +10,63 @@ ENV CXX /usr/bin/g++
 ENV FC  /usr/bin/gfortran
 ENV F77 /usr/bin/gfortran
 
-#
-# Define library versions.
-# Match WCOSS2 versions as of October, 2022.
-#
-ENV HDF5_VER       1_10_6
-ENV NETCDF4C_VER   4.7.4
-ENV NETCDF4CXX_VER 4.3.1
+ENV PYTHON_VER 3.10.4
 
-#
-# Define package URL's.
-#
-ENV HDF4_URL       http://www.hdfgroup.org/ftp/HDF/releases/HDF4.2r3/src/HDF4.2r3.tar.gz
-ENV HDFEOS_URL     https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/HDF-EOS2.16v1.00.tar.Z
-
-ENV HDF5_URL       https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-${HDF5_VER}.zip
-ENV NETCDF4C_URL   https://github.com/Unidata/netcdf-c/archive/refs/tags/v${NETCDF4C_VER}.zip
-ENV NETCDF4CXX_URL https://github.com/Unidata/netcdf-cxx4/archive/v${NETCDF4CXX_VER}.tar.gz
-
-ENV BUFRLIB_URL    https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/BUFRLIB_v10-2-3.tar
 ENV GSFONT_URL     https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/ghostscript-fonts-std-8.11.tar.gz
 
 #
-# Install the required packages.
+# Setup the environment for interactive bash shell.
+# Set soft limit to unlimited to prevent GRIB2 seg faults
 #
-RUN yum -y update \
- && yum -y install file gcc gcc-gfortran gcc-c++ glibc.i686 libgcc.i686 \
-                   libpng-devel jasper jasper-devel zlib zlib-devel \
-                   cairo-devel freetype-devel epel-release \
-                   hostname m4 make tar tcsh ksh time wget which \
-                   flex flex-devel bison bison-devel unzip \
- && yum -y install git g2clib-devel gsl-devel \
- && yum -y install sqlite-devel libffi-devel libcurl-devel.x86_64 \
- && yum -y install gv ncview wgrib wgrib2 ImageMagick ps2pdf \
- && yum -y install python3 python3-devel python3-pip
+RUN echo export MET_BASE=/usr/local/share/met >> /root/.bashrc \
+ && echo export MET_FONT_DIR=/usr/local/share/met/fonts >> /root/.bashrc \
+ && echo export RSCRIPTS_BASE=/usr/local/share/met/Rscripts >> /root/.bashrc \
+ && echo ulimit -S -s unlimited >> /root/.bashrc
 
-# Needed to prevent error in subsequent pip command 
-ENV LD_LIBRARY_PATH /usr/local/lib
+ENV MET_FONT_DIR /usr/local/share/met/fonts
 
-RUN pip3 install --upgrade pip \
- && python3 -m pip install numpy xarray netCDF4
+# Install required system tools
+RUN apt update && apt -y upgrade \
+  && apt install -y build-essential gfortran wget unzip curl imagemagick \
+  libcurl4-gnutls-dev m4 git automake flex bison libjpeg-dev libpixman-1-dev \
+  emacs less \
+  libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev \
+  libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev
+
+#
+# Install Python
+# https://linuxhint.com/install-python-debian-10/
+#
+RUN wget https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tgz \
+    && tar xzf Python-${PYTHON_VER}.tgz \
+    && cd Python-${PYTHON_VER} \
+    && ./configure --enable-optimizations --enable-shared LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" \
+    && make -j `nproc` \
+    && make install \
+    && python3 -m pip install --upgrade pip \
+    && python3 -m pip install numpy xarray netCDF4
+
+RUN echo "Downloading GhostScript fonts from ${GSFONT_URL} into /usr/local/share/met" \
+ && mkdir -p /usr/local/share/met \
+ && curl -SL ${GSFONT_URL} | tar zxC /usr/local/share/met
+
+# Fix rules for ghostscript files in convert
+# See: https://en.linuxportal.info/tutorials/troubleshooting/how-to-fix-errors-from-imagemagick-imagick-conversion-system-security-policy
+#
+RUN sed -i 's/policy domain="coder" rights="none" pattern="PS/policy domain="coder" rights="read | write" pattern="PS/g' /etc/ImageMagick-6/policy.xml \
+    && sed -i 's/policy domain="coder" rights="none" pattern="EPS"/policy domain="coder" rights="read | write" pattern="EPS"/g' /etc/ImageMagick-6/policy.xml \
+    && sed -i 's/policy domain="coder" rights="none" pattern="PDF"/policy domain="coder" rights="read | write" pattern="PDF"/g' /etc/ImageMagick-6/policy.xml \
+    && sed -i 's/policy domain="coder" rights="none" pattern="XPS"/policy domain="coder" rights="read | write" pattern="XPS"/g' /etc/ImageMagick-6/policy.xml
 
 #
 # Set the working directory.
 #
 WORKDIR /met
 
-#
-# Setup the environment for interactive bash/csh container shells.
-#
-RUN echo export MET_BASE=/usr/local/share/met >> /etc/bashrc \
- && echo setenv MET_BASE /usr/local/share/met >> /etc/csh.cshrc \
- && echo export MET_FONT_DIR=/usr/local/share/met/fonts >> /etc/bashrc \
- && echo setenv MET_FONT_DIR /usr/local/share/met/fonts >> /etc/csh.cshrc \
- && echo export RSCRIPTS_BASE=/usr/local/share/met/Rscripts >> /etc/bashrc \
- && echo setenv RSCRIPTS_BASE /usr/local/share/met/Rscripts >> /etc/csh.cshrc
-
-ENV MET_FONT_DIR /usr/local/share/met/fonts
-
-#
-# Download and install BUFRLIB.
-#
-RUN mkdir -p /met/logs \
- && mkdir -p /met/external_libs/BUFRLIB \
- && cd /met/external_libs/BUFRLIB \
- && echo "Downloading BUFRLIB from ${BUFRLIB_URL}" \
- && curl -SL ${BUFRLIB_URL} | tar xC /met/external_libs/BUFRLIB \
- && cat preproc.sh | sed 's/cpp /cpp -traditional-cpp /g' > preproc_patch.sh \
- && chmod +x preproc_patch.sh \
- && LOG_FILE=/met/logs/BUFRLIB_build.log \
- && echo "Compiling BUFRLIB and writing log file ${LOG_FILE}" \
- && ./preproc_patch.sh *.F > ${LOG_FILE} \
- && ${CC} -c -DUNDERSCORE *.c >> ${LOG_FILE} \
- && ${FC} -c -fno-second-underscore *.f >> ${LOG_FILE} \
- && ar crv libbufr.a *.o >> ${LOG_FILE} \
- && rm -f /usr/local/lib/libbufr.a \
- && cp  *.a /usr/local/lib \
- && cd /met/external_libs \
- && rm -rf BUFRLIB
-
-#
-# Download and install HDF5.
-#
-RUN mkdir -p /met/external_libs/hdf5 \
- && cd /met/external_libs/hdf5 \
- && echo "Downloading HDF5 from ${HDF5_URL}" \
- && wget ${HDF5_URL} \
- && unzip hdf5-${HDF5_VER}.zip \
- && cd hdf5-hdf5-${HDF5_VER} \
- && LOG_FILE=/met/logs/hdf5-hdf5-${HDF5_VER}_configure.log \
- && echo "Configuring hdf5-hdf5-${HDF5_VER} and writing log file ${LOG_FILE}" \
- && ./configure --prefix=/usr/local --enable-cxx --with-default-api-version=v18 > ${LOG_FILE} \
- && LOG_FILE=/met/logs/hdf5-hdf5-${HDF5_VER}_make_install.log \
- && echo "Compiling hdf5-hdf5-${HDF5_VER} and writing log file ${LOG_FILE}" \
- && make install > ${LOG_FILE} \
- && cd /met/external_libs \
- && rm -rf hdf5
-
-#
-# Download and install NetCDF4 (C and C++).
-#
-RUN mkdir -p /met/external_libs/netcdf \
- && cd /met/external_libs/netcdf \
- && echo "Downloading netcdf-c-${NETCDF4C_VER} from ${NETCDF4C_URL}" \
- && wget ${NETCDF4C_URL} \
- && unzip v${NETCDF4C_VER}.zip \
- && cd netcdf-c-${NETCDF4C_VER} \
- && LOG_FILE=/met/logs/netcdf-c-${NETCDF4C_VER}_configure.log \
- && echo "Configuring netcdf-c-${NETCDF4C_VER} and writing log file ${LOG_FILE}" \
- && ./configure --enable-shared --enable-netcdf-4 > ${LOG_FILE} \
- && LOG_FILE=/met/logs/netcdf-c-${NETCDF4C_VER}_make_install.log \
- && echo "Compiling netcdf-c-${NETCDF4C_VER} and writing log file ${LOG_FILE}" \
- && make install > ${LOG_FILE} \
- && echo "Downloading  from ${NETCDF4CXX_URL}" \
- && cd /met/external_libs/netcdf \
- && wget ${NETCDF4CXX_URL} \
- && tar -xzf v${NETCDF4CXX_VER}.tar.gz \
- && cd netcdf-cxx4-${NETCDF4CXX_VER} \
- && LOG_FILE=/met/logs/netcdf-cxx4-${NETCDF4CXX_VER}_configure.log \
- && echo "Configuring netcdf-cxx4-${NETCDF4CXX_VER} and writing log file ${LOG_FILE}" \
- && ./configure > ${LOG_FILE} \
- && LOG_FILE=/met/logs/netcdf-cxx4-${NETCDF4CXX_VER}_make_install.log \
- && echo "Compiling netcdf-cxx4-${NETCDF4CXX_VER} and writing log file ${LOG_FILE}" \
- && make install > ${LOG_FILE} \
- && cd /met/external_libs \
- && rm -rf netcdf
-
-#
-# Download and install HDF4 and HDFEOS.
-#
-RUN echo "Downloading HDF4.2r3 from ${HDF4_URL}" \
- && curl -SL ${HDF4_URL} | tar zxC /met/external_libs \
- && cd /met/external_libs/HDF4.2r3 \
- && LOG_FILE=/met/logs/HDF4.2r3_configure.log \
- && echo "Configuring HDF4.2r3 and writing log file ${LOG_FILE}" \
- && ./configure --prefix=/usr/local/hdf --disable-netcdf > ${LOG_FILE} \
- && cat mfhdf/hdiff/Makefile | sed 's/LIBS = -ljpeg -lz/LIBS = -ljpeg -lz -lm/g' > Makefile_NEW \
- && mv -f Makefile_NEW mfhdf/hdiff/Makefile \
- && LOG_FILE=/met/logs/HDF4.2r3_make_install.log \
- && echo "Compiling HDF4.2r3 and writing log file ${LOG_FILE}" \
- && make install > ${LOG_FILE} \
- && echo "Downloading hdfeos from ${HDFEOS_URL}" \
- && curl -SL ${HDFEOS_URL} | tar zxC /met/external_libs \
- && cd /met/external_libs/hdfeos \
- && LOG_FILE=/met/logs/hdfeos_configure.log \
- && echo "Configuring hdfeos and writing log file ${LOG_FILE}" \
- && ./configure --prefix=/usr/local/hdfeos --with-hdf4=/usr/local/hdf CC=/usr/local/hdf/bin/h4cc > ${LOG_FILE} \
- && LOG_FILE=/met/logs/hdfeos_make_install.log \
- && echo "Compiling hdfeos and writing log file ${LOG_FILE}" \
- && make install > ${LOG_FILE} \
- && mkdir /usr/local/hdfeos/include \
- && cp include/*.h /usr/local/hdfeos/include/. \
- && cd /met/external_libs \
- && rm -rf HDF4.2r3 hdfeos
-
-RUN echo "Downloading GhostScript fonts from ${GSFONT_URL} into /usr/local/share/met" \
- && mkdir -p /usr/local/share/met \
- && curl -SL ${GSFONT_URL} | tar zxC /usr/local/share/met
+RUN wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz \
+    && wget https://raw.githubusercontent.com/dtcenter/MET/develop/internal/scripts/installation/compile_MET_all.sh \
+    && wget https://raw.githubusercontent.com/dtcenter/MET/develop/internal/scripts/environment/development.docker \
+    && tar -zxf tar_files.tgz \
+    && export SKIP_MET=yes \
+    && chmod +x compile_MET_all.sh \
+    && ./compile_MET_all.sh development.docker
