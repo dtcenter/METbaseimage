@@ -22,7 +22,6 @@ jobs:
         uses: devops-actions/action-get-tag@v1.0.1
         with:
           strip_v: false
-          default: v0.0.0
 
       - name: Build Docker Image
         run: .github/jobs/build_docker_image.sh
