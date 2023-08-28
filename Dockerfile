@@ -30,9 +30,9 @@ RUN apt update && apt -y upgrade \
   && apt install -y build-essential gfortran wget unzip curl imagemagick \
   libcurl4-gnutls-dev m4 git automake flex bison libjpeg-dev libpixman-1-dev \
   emacs less \
-  libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev \
+  libreadline-gplv2-dev libncursesw5-dev libssl-dev tk-dev \
   libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev \
-  cmake libtiff-dev
+  cmake libtiff-dev sqlite3 libsqlite3-dev
 
 #
 # Install Python
