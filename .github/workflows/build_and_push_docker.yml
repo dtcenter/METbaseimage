@@ -19,7 +19,7 @@ jobs:
 
       - name: Get tag name
         id: get_tag_name
-        uses: devops-actions/action-get-tag@v1.0.1
+        uses: devops-actions/action-get-tag@v1.0.2
         with:
           strip_v: false
 
