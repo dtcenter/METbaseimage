@@ -31,7 +31,7 @@ jobs:
       - name: Push Docker Image
         run: .github/jobs/push_docker_image.sh
         env:
-          GITHUB_TAG: ${{ steps.get_tag_name.outputs.tag_name }}
+          GITHUB_TAG: ${{ steps.get_tag_name.outputs.tag }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
