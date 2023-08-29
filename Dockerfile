@@ -34,19 +34,6 @@ RUN apt update && apt -y upgrade \
   libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev \
   cmake libtiff-dev sqlite3 libsqlite3-dev
 
-#
-# Install Python
-# https://linuxhint.com/install-python-debian-10/
-#
-RUN wget https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tgz \
-    && tar xzf Python-${PYTHON_VER}.tgz \
-    && cd Python-${PYTHON_VER} \
-    && ./configure --enable-optimizations --enable-shared LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" \
-    && make -j `nproc` \
-    && make install \
-    && python3 -m pip install --upgrade pip \
-    && python3 -m pip install numpy xarray netCDF4
-
 RUN echo "Downloading GhostScript fonts from ${GSFONT_URL} into /usr/local/share/met" \
  && mkdir -p /usr/local/share/met \
  && curl -SL ${GSFONT_URL} | tar zxC /usr/local/share/met
@@ -65,9 +52,22 @@ RUN sed -i 's/policy domain="coder" rights="none" pattern="PS/policy domain="cod
 WORKDIR /met
 
 RUN wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz \
-    && wget https://raw.githubusercontent.com/dtcenter/MET/develop/internal/scripts/installation/compile_MET_all.sh \
-    && wget https://raw.githubusercontent.com/dtcenter/MET/develop/internal/scripts/environment/development.docker \
+    && wget https://raw.githubusercontent.com/dtcenter/MET/feature_2669_proj/internal/scripts/installation/compile_MET_all.sh \
+    && wget https://raw.githubusercontent.com/dtcenter/MET/feature_2669_proj/internal/scripts/environment/development.docker \
     && tar -zxf tar_files.tgz \
     && export SKIP_MET=yes \
     && chmod +x compile_MET_all.sh \
     && ./compile_MET_all.sh development.docker
+
+#
+# Install Python
+# https://linuxhint.com/install-python-debian-10/
+#
+RUN wget https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tgz \
+    && tar xzf Python-${PYTHON_VER}.tgz \
+    && cd Python-${PYTHON_VER} \
+    && ./configure --enable-optimizations --enable-shared LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" \
+    && make -j `nproc` \
+    && make install \
+    && python3 -m pip install --upgrade pip \
+    && python3 -m pip install numpy xarray netCDF4
