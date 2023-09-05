@@ -8,6 +8,12 @@ Please see the [MET website](https://dtcenter.org/community-code/model-evaluatio
 Version History
 ===============
 
+v2.1
+----
+
+* Completes transition to debian base image using Debian 12 (bookworm)
+* Adds Proj library dependency
+
 v2.0_debian10
 -------------
 

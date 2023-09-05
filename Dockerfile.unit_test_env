@@ -15,13 +15,12 @@ WORKDIR /met
 #
 RUN echo "Installing tools needed for running MET unit tests..." \
  && echo "Installing Perl XML Parser..." \
- && yum makecache \
- && yum -y install perl-XML-Parser \
+ && apt install -y libxml-parser-perl \
  && echo "Installing R..." \
- && yum -y install R \
- && echo "Installing R ncdf4 1.19..." \
- && wget https://cran.r-project.org/src/contrib/ncdf4_1.19.tar.gz \
- && R CMD INSTALL ncdf4_1.19.tar.gz \
- && echo "Installing NCO (for ncdiff)..." \
- && yum -y install nco \
+ && apt install -y r-base \
+ && echo "Installing R ncdf4 1.21..." \
+ && wget https://cran.r-project.org/src/contrib/ncdf4_1.21.tar.gz \
+ && R CMD INSTALL --configure-args="--with-nc-config=/usr/local/netcdf/netcdf-c-4.7.4/nc-config" ncdf4_1.21.tar.gz \
+ && echo "Installing NCO and netcdf-bin (for ncdiff)..." \
+ && apt install -y nco netcdf-bin \
  && echo "Finished installing unit test tools"
