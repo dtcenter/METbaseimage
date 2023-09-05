@@ -55,8 +55,8 @@ RUN sed -i 's/policy domain="coder" rights="none" pattern="PS/policy domain="cod
 WORKDIR /met
 
 RUN wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz \
- && wget https://raw.githubusercontent.com/dtcenter/MET/feature_2669_proj/internal/scripts/installation/compile_MET_all.sh \
- && wget https://raw.githubusercontent.com/dtcenter/MET/feature_2669_proj/internal/scripts/environment/development.docker \
+ && wget https://raw.githubusercontent.com/dtcenter/MET/develop/internal/scripts/installation/compile_MET_all.sh \
+ && wget https://raw.githubusercontent.com/dtcenter/MET/develop/internal/scripts/environment/development.docker \
  && tar -zxf tar_files.tgz \
  && export SKIP_MET=TRUE \
  && chmod +x compile_MET_all.sh \
