@@ -13,6 +13,7 @@ v2.1
 
 * Completes transition to debian base image using Debian 12 (bookworm)
 * Adds Proj library dependency
+* Note that upgrading from Debian 10 to 12 requires that the METplus [runtime environements](https://github.com/dtcenter/METplus/tree/develop/internal/scripts/docker_env) also be upgraded to Debian 12
 
 v2.0_debian10
 -------------
