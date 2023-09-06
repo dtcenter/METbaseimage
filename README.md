@@ -8,8 +8,10 @@ Please see the [MET website](https://dtcenter.org/community-code/model-evaluatio
 Version History
 ===============
 
-v2.1
+v3.0
 ----
+
+Increasing the major version number from 2 to 3 because of the operating system version change from Debian 10 to 12.
 
 * Completes transition to debian base image using Debian 12 (bookworm)
 * Adds Proj library dependency
