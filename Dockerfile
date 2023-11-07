@@ -73,10 +73,15 @@ RUN wget https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tg
  && make install \
  && ln -s /usr/local/bin/python3 /usr/local/bin/python \
  && BLDOPTS="--force-reinstall --global-option=build_ext --global-option=\"-R/usr/local/lib\" --global-option=\"-L/usr/local/lib\"" \
- && python3 -m pip install --upgrade pip \
- && python3 -m pip install ${BLDOPTS} numpy \
+ && python3 -m pip install --upgrade pip
+
+#
+# Install required Python packages
+#
+RUN python3 -m pip install ${BLDOPTS} numpy \
  && python3 -m pip install ${BLDOPTS} xarray \
  && export HDF5_DIR=/usr/local/ \
  && export NETCDF4_DIR=/usr/local/ \
  && python3 -m pip install ${BLDOPTS} netCDF4 \
- && python3 -m pip install ${BLDOPTS} yaml
+ && python3 -m pip install ${BLDOPTS} pyyaml
+
