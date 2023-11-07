@@ -78,4 +78,5 @@ RUN wget https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tg
  && python3 -m pip install ${BLDOPTS} xarray \
  && export HDF5_DIR=/usr/local/ \
  && export NETCDF4_DIR=/usr/local/ \
- && python3 -m pip install ${BLDOPTS} netCDF4
+ && python3 -m pip install ${BLDOPTS} netCDF4 \
+ && python3 -m pip install ${BLDOPTS} yaml
