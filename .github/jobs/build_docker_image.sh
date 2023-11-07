@@ -1,5 +1,12 @@
 #! /bin/bash                                                                                                                                                    
+
 source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
+
+# Required environment variables:
+#   $GITHUB_WORKSPACE is the full path to METbaseimage.
+#   $GITHUB_TAG is the tag name (e.g. vX.Y).
+#   $DOCKERHUB_BASE_REPO is dtcenter/met-base.
+#   $DOCKERHUB_UNIT_TEST_REPO is dtcenter/met-base-unit-test.
 
 MET_BASE_TAG=${GITHUB_TAG}
 
