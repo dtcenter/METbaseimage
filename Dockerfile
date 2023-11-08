@@ -12,7 +12,7 @@ ENV F77 /usr/bin/gfortran
 
 ENV PYTHON_VER 3.10.4
 
-ENV GSFONT_URL     https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/ghostscript-fonts-std-8.11.tar.gz
+ENV GSFONT_URL https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/ghostscript-fonts-std-8.11.tar.gz
 
 #
 # Set up the environment for interactive bash shell
@@ -54,14 +54,6 @@ RUN sed -i 's/policy domain="coder" rights="none" pattern="PS/policy domain="cod
 #
 WORKDIR /met
 
-RUN wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz \
- && wget https://raw.githubusercontent.com/dtcenter/MET/develop/internal/scripts/installation/compile_MET_all.sh \
- && wget https://raw.githubusercontent.com/dtcenter/MET/develop/internal/scripts/environment/development.docker \
- && tar -zxf tar_files.tgz \
- && export SKIP_MET=TRUE \
- && chmod +x compile_MET_all.sh \
- && ./compile_MET_all.sh development.docker
-
 #
 # Install Python from source
 #
@@ -71,17 +63,29 @@ RUN wget https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tg
  && ./configure --enable-optimizations --enable-shared LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" \
  && make -j `nproc` \
  && make install \
- && ln -s /usr/local/bin/python3 /usr/local/bin/python \
- && BLDOPTS="--force-reinstall --global-option=build_ext --global-option=\"-R/usr/local/lib\" --global-option=\"-L/usr/local/lib\"" \
- && python3 -m pip install --upgrade pip
+ && ln -s /usr/local/bin/python3 /usr/local/bin/python
+
+#
+# Compile the MET libraries
+#
+ARG MET_COMPILE_SCRIPT_BRANCH=develop
+RUN echo "Pulling compilation script from MET branch ${MET_COMPILE_SCRIPT_BRANCH}" \
+ && wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz \
+ && wget https://raw.githubusercontent.com/dtcenter/MET/${MET_COMPILE_SCRIPT_BRANCH}/internal/scripts/installation/compile_MET_all.sh \
+ && wget https://raw.githubusercontent.com/dtcenter/MET/${MET_COMPILE_SCRIPT_BRANCH}/internal/scripts/environment/development.docker \
+ && tar -zxf tar_files.tgz \
+ && export SKIP_MET=TRUE \
+ && chmod +x compile_MET_all.sh \
+ && ./compile_MET_all.sh development.docker
 
 #
 # Install required Python packages
 #
-RUN python3 -m pip install ${BLDOPTS} numpy \
- && python3 -m pip install ${BLDOPTS} xarray \
+RUN BLDOPTS="--global-option=build_ext --global-option=\"-R/usr/local/lib\" --global-option=\"-L/usr/local/lib\"" \
+ && python3 -m pip install --upgrade pip \
+ && python3 -m pip install ${BLDOPTS} numpy==1.24.2 \
+ && python3 -m pip install ${BLDOPTS} xarray==2023.1.0 \
  && export HDF5_DIR=/usr/local/ \
  && export NETCDF4_DIR=/usr/local/ \
- && python3 -m pip install ${BLDOPTS} netCDF4 \
- && python3 -m pip install ${BLDOPTS} pyyaml
-
+ && python3 -m pip install ${BLDOPTS} netCDF4==1.6.2 \
+ && python3 -m pip install ${BLDOPTS} pyyaml>=6.0
