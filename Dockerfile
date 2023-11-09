@@ -70,10 +70,10 @@ RUN wget https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tg
 #
 ARG MET_COMPILE_SCRIPT_BRANCH=develop
 RUN echo "Pulling compilation script from MET branch ${MET_COMPILE_SCRIPT_BRANCH}" \
- && wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz \
+ && wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.develop.tgz \
  && wget https://raw.githubusercontent.com/dtcenter/MET/${MET_COMPILE_SCRIPT_BRANCH}/internal/scripts/installation/compile_MET_all.sh \
  && wget https://raw.githubusercontent.com/dtcenter/MET/${MET_COMPILE_SCRIPT_BRANCH}/internal/scripts/environment/development.docker \
- && tar -zxf tar_files.tgz \
+ && tar -zxf tar_files.develop.tgz \
  && export SKIP_MET=TRUE \
  && chmod +x compile_MET_all.sh \
  && ./compile_MET_all.sh development.docker
