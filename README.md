@@ -8,6 +8,12 @@ Please see the [MET website](https://dtcenter.org/community-code/model-evaluatio
 Version History
 ===============
 
+v3.1
+----
+
+* Compile the ecKit and Atlas libraries (#13)
+* Install the YAML Python package (#15)
+
 v3.0
 ----
 
