@@ -8,6 +8,11 @@ Please see the [MET website](https://dtcenter.org/community-code/model-evaluatio
 Version History
 ===============
 
+v3.2
+----
+
+* Install SciPy Python package (#20)
+
 v3.1
 ----
 
