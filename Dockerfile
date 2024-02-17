@@ -69,7 +69,7 @@ RUN wget https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tg
 # Compile the MET libraries
 #
 ARG MET_COMPILE_SCRIPT_BRANCH=develop
-ARG MET_TAR_FILE_VERSION_NAME=met-base-v3.1
+ARG MET_TAR_FILE_VERSION_NAME=met-base-v3.2
 RUN echo "Pulling compilation script from MET branch ${MET_COMPILE_SCRIPT_BRANCH}" \
  && wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.${MET_TAR_FILE_VERSION_NAME}.tgz \
  && wget https://raw.githubusercontent.com/dtcenter/MET/${MET_COMPILE_SCRIPT_BRANCH}/internal/scripts/installation/compile_MET_all.sh \
