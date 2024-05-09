@@ -91,3 +91,9 @@ RUN BLDOPTS="--global-option=build_ext --global-option=\"-R/usr/local/lib\" --gl
  && python3 -m pip install ${BLDOPTS} netCDF4==1.6.2 \
  && python3 -m pip install ${BLDOPTS} pyyaml==6.0.1 \
  && python3 -m pip install scipy==1.11.1
+
+#
+# Run linker configuration
+#
+RUN ldconfig
+
