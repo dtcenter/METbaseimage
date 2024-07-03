@@ -1,7 +1,5 @@
 ARG MET_BASE_TAG
-
 FROM dtcenter/met-base:${MET_BASE_TAG}
-
 MAINTAINER John Halley Gotway <johnhg@ucar.edu>
 
 #
