@@ -8,6 +8,7 @@ on:
 env:
   DOCKERHUB_BASE_REPO: dtcenter/met-base
   DOCKERHUB_UNIT_TEST_REPO: dtcenter/met-base-unit-test
+  DOCKERHUB_METVIEWER_REPO: dtcenter/met-base-metviewer
 
 jobs:
 

@@ -13,6 +13,8 @@ v3.2
 
 * Install SciPy Python package (#20)
 
+UPDATE: 7/3/2024 Manually pushed the dtcenter/met-base-metviewer:v3.2 image to DockerHub to serve as the new base image for METviewer development and testing (#23)
+
 v3.1
 ----
 
