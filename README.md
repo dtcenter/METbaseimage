@@ -8,15 +8,12 @@ Please see the [MET website](https://dtcenter.org/community-code/model-evaluatio
 Version History
 ===============
 
-v3.3
-----
-
-* Add Dockerfile.metviewer to provide a base image for METviewer testing and development (#23)
-
 v3.2
 ----
 
 * Install SciPy Python package (#20)
+
+UPDATE: 7/3/2024 Manually pushed the dtcenter/met-base-metviewer:v3.2 image to DockerHub to serve as the new base image for METviewer development and testing (#23)
 
 v3.1
 ----
