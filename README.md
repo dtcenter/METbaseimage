@@ -8,6 +8,11 @@ Please see the [MET website](https://dtcenter.org/community-code/model-evaluatio
 Version History
 ===============
 
+v3.3
+----
+
+* Add Dockerfile.metviewer to provide a base image for METviewer testing and development (#23)
+
 v3.2
 ----
 
