@@ -11,7 +11,7 @@ Version History
 v3.3
 ----
 
-* Update METbaseimage to use newer versions of atlas and eckit (#27)
+* Update METbaseimage to use newer versions of ecKit and Atlas libraries (#27)
 
 v3.2
 ----
