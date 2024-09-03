@@ -8,6 +8,11 @@ Please see the [MET website](https://dtcenter.org/community-code/model-evaluatio
 Version History
 ===============
 
+v3.3
+----
+
+* Update METbaseimage to use newer versions of ecKit and Atlas libraries (#27)
+
 v3.2
 ----
 
