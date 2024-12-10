@@ -1,5 +1,5 @@
-Model Evalulation Tools Base Image (METbaseimage)
-=================================================
+Model Evaluation Tools Base Image (METbaseimage)
+================================================
 
 This repository contains Dockerfiles which define environments for building and testing the Model Evaluation Tools (MET) software package.
 
