@@ -1,6 +1,6 @@
 ARG MET_BASE_TAG
 FROM dtcenter/met-base:${MET_BASE_TAG}
-MAINTAINER John Halley Gotway <johnhg@ucar.edu>
+LABEL maintainer="John Halley Gotway <johnhg@ucar.edu>"
 
 #
 # Set the working directory.
@@ -13,6 +13,7 @@ WORKDIR /met
 #
 RUN echo "Installing tools needed for running MET unit tests..." \
  && echo "Installing Perl XML Parser..." \
+ && apt update && apt -y upgrade \
  && apt install -y libxml-parser-perl \
  && echo "Installing R..." \
  && apt install -y r-base \
