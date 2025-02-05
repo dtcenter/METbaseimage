@@ -22,4 +22,5 @@ RUN echo "Installing tools needed for running MET unit tests..." \
  && R CMD INSTALL --configure-args="--with-nc-config=/usr/local/netcdf/netcdf-c-4.7.4/nc-config" ncdf4_1.21.tar.gz \
  && echo "Installing NCO and netcdf-bin (for ncdiff)..." \
  && apt install -y nco netcdf-bin \
+ && apt clean \
  && echo "Finished installing unit test tools"

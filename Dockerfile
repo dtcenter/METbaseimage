@@ -32,7 +32,7 @@ RUN \
      libpixman-1-dev libreadline-dev libsqlite3-dev libssl-dev libtiff-dev m4 \
      sqlite3 tk-dev unzip vim wget zlib1g-dev \
  && echo "Clean cache after installing system packages" &&\
-    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* \
+    apt clean \
  && echo "Downloading GhostScript fonts from ${GSFONT_URL} into /usr/local/share/met" &&\
     mkdir -p /usr/local/share/met &&\
     curl -SL ${GSFONT_URL} | tar zxC /usr/local/share/met \
