@@ -2,15 +2,12 @@ ARG MET_BASE_TAG
 FROM dtcenter/met-base:${MET_BASE_TAG}
 LABEL maintainer="John Halley Gotway <johnhg@ucar.edu>"
 
-#
 # Set the working directory.
-#
+
 WORKDIR /met
 
-#
-# Download and install MET and GhostScript fonts.
-# Delete the MET source code for tagged releases matching "v"*.
-#
+# install Perl XML parser, R (with ncdf4) and NC tools
+
 RUN echo "Installing tools needed for running MET unit tests..." \
  && echo "Installing Perl XML Parser..." \
  && apt update && apt -y upgrade \
