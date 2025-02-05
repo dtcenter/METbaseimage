@@ -28,9 +28,9 @@ RUN \
     apt update && apt -y upgrade &&\
     apt install -y automake bison build-essential cmake curl emacs flex \
      gfortran git imagemagick less libbz2-dev libc6-dev libcurl4-gnutls-dev \
-     libffi-dev libgdbm-dev libjpeg-dev libncursesw5-dev libpixman-1-dev \
-     libreadline-dev libsqlite3-dev libssl-dev libtiff-dev m4 sqlite3 tk-dev \
-     unzip vim wget zlib1g-dev \
+     libffi-dev libgdbm-dev libjpeg-dev libncursesw5-dev libopenblas-dev \
+     libpixman-1-dev libreadline-dev libsqlite3-dev libssl-dev libtiff-dev m4 \
+     sqlite3 tk-dev unzip vim wget zlib1g-dev \
  && echo "Clean cache after installing system packages" &&\
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* \
  && echo "Downloading GhostScript fonts from ${GSFONT_URL} into /usr/local/share/met" &&\
