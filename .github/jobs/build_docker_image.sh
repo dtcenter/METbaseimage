@@ -35,7 +35,7 @@ if [ $? != 0 ]; then
   cat ${GITHUB_WORKSPACE}/docker_build_met_base_unit_test_env_image.log
   exit 1
 fi
-exit 0
+
 # Build dtcenter/met-base-metviewer
 DOCKERHUB_TAG_METVIEWER=${DOCKERHUB_METVIEWER_REPO}:${GITHUB_TAG}
 DOCKERFILE_PATH=${GITHUB_WORKSPACE}/Dockerfile.metviewer

@@ -25,7 +25,7 @@ time_command docker push ${DOCKERHUB_TAG_UNIT_TEST}
 if [ $? != 0 ]; then
   exit 1
 fi
-exit 0
+
 # Push dtcenter/met-base-metviewer
 time_command docker push ${DOCKERHUB_TAG_METVIEWER}
 if [ $? != 0 ]; then
