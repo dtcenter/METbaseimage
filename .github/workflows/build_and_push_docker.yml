@@ -4,7 +4,9 @@ on:
   push:
     tags:
       - v*
-      
+
+  workflow_dispatch:
+
 env:
   DOCKERHUB_BASE_REPO: dtcenter/met-base
   DOCKERHUB_UNIT_TEST_REPO: dtcenter/met-base-unit-test
