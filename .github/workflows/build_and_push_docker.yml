@@ -4,13 +4,6 @@ on:
   push:
     tags:
       - v*
-    tags-ignore:
-      - v[1-2]*
-      - v3.[0-2]*
-
-  # Rebuild tags listed above daily at 01:15
-  schedule:
-    - cron: '15 01 * * *'
 
   workflow_dispatch:
 
