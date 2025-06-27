@@ -2,6 +2,8 @@ name: Build Docker Images
 
 on:
   push:
+    branches:
+      - develop
     tags:
       - v*
 
@@ -20,21 +22,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Get tag name
-        id: get_tag_name
-        uses: devops-actions/action-get-tag@v1.0.2
-        with:
-          strip_v: false
-
       - name: Build Docker Image
         run: .github/jobs/build_docker_image.sh
         env:
-          GITHUB_TAG: ${{ steps.get_tag_name.outputs.tag }}
+          GITHUB_NAME: ${{ github.ref_name }}
 
       - name: Push Docker Image
         run: .github/jobs/push_docker_image.sh
         env:
-          GITHUB_TAG: ${{ steps.get_tag_name.outputs.tag }}
+          GITHUB_NAME: ${{ github.ref_name }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
