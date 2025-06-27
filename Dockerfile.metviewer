@@ -36,9 +36,9 @@ RUN \
      mv apache-tomcat* ${CATALINA_HOME} &&\
      chmod +x ${CATALINA_HOME}/bin/*sh \
   && echo "Create a link for python3" &&\
-     ln -sf /usr/local/bin/python3.10  /usr/bin/python3 &&\
+     ln -sf /usr/local/bin/python3  /usr/bin/python3 &&\
      ln -sf /usr/bin/python3  /usr/bin/python &&\
-     ln -sf /usr/local/bin/pip3.10  /usr/bin/pip3 &&\
+     ln -sf /usr/local/bin/pip3  /usr/bin/pip3 &&\
      ln -sf /usr/bin/pip3  /usr/bin/pip
 
 WORKDIR /tmp
