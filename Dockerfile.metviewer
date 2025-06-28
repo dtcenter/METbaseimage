@@ -4,11 +4,14 @@ MAINTAINER John Halley Gotway <johnhg@ucar.edu>
 
 #
 # Constants
+# Original Tomcat Source:
+#   https://archive.apache.org/dist/tomcat/tomcat-${TOMCAT_MAJOR_VERSION}/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz
 #
-ENV TOMCAT_MAJOR_VERSION 9
-ENV TOMCAT_MINOR_VERSION 0.89
-ENV TOMCAT_VERSION ${TOMCAT_MAJOR_VERSION}.${TOMCAT_MINOR_VERSION}
-ENV CATALINA_HOME /opt/tomcat
+ENV TOMCAT_MAJOR_VERSION=9
+ENV TOMCAT_MINOR_VERSION=0.89
+ENV TOMCAT_VERSION=${TOMCAT_MAJOR_VERSION}.${TOMCAT_MINOR_VERSION}
+ENV TOMCAT_URL=https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/apache-tomcat-${TOMCAT_VERSION}.tar.gz
+ENV CATALINA_HOME=/opt/tomcat
 
 #
 # Install system updates
@@ -44,7 +47,7 @@ RUN Rscript -e "install.packages('boot')" \
 #
 ENV CATALINA_HOME /opt/tomcat
 
-RUN wget https://archive.apache.org/dist/tomcat/tomcat-${TOMCAT_MAJOR_VERSION}/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz \
+RUN wget ${TOMCAT_URL} \
  && tar -xvf apache-tomcat-${TOMCAT_VERSION}.tar.gz \
  && rm apache-tomcat*.tar.gz \
  && mv apache-tomcat* ${CATALINA_HOME} \
