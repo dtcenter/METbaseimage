@@ -4,15 +4,16 @@ LABEL maintainer="John Halley Gotway <johnhg@ucar.edu>"
 
 #
 # Constants
+# Original Tomcat Souce:
+#   https://archive.apache.org/dist/tomcat/tomcat-${TOMCAT_MAJOR_VERSION}/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz
 #
 ENV TOMCAT_MAJOR_VERSION=9
 ENV TOMCAT_MINOR_VERSION=0.89
 ENV TOMCAT_VERSION=${TOMCAT_MAJOR_VERSION}.${TOMCAT_MINOR_VERSION}
+ENV TOMCAT_URL=https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/apache-tomcat-${TOMCAT_VERSION}.tar.gz
 ENV CATALINA_HOME=/opt/tomcat
 
-
 # Expose METviewer port
-
 EXPOSE 8080
 
 RUN \
@@ -30,7 +31,7 @@ RUN \
      Rscript -e "install.packages('data.table')" &&\
      Rscript -e "install.packages('verification')" \
   && echo "Install Tomcat" &&\
-     wget https://archive.apache.org/dist/tomcat/tomcat-${TOMCAT_MAJOR_VERSION}/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz &&\
+     wget ${TOMCAT_URL} &&\
      tar -xvf apache-tomcat-${TOMCAT_VERSION}.tar.gz &&\
      rm apache-tomcat*.tar.gz &&\
      mv apache-tomcat* ${CATALINA_HOME} &&\
