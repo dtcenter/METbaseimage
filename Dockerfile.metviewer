@@ -4,7 +4,7 @@ LABEL maintainer="John Halley Gotway <johnhg@ucar.edu>"
 
 #
 # Constants
-# Original Tomcat Souce:
+# Original Tomcat Source:
 #   https://archive.apache.org/dist/tomcat/tomcat-${TOMCAT_MAJOR_VERSION}/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz
 #
 ENV TOMCAT_MAJOR_VERSION=9
