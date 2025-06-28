@@ -68,7 +68,7 @@ RUN wget https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tg
 #
 # Compile the MET libraries
 #
-ARG MET_COMPILE_SCRIPT_BRANCH=develop
+ARG MET_COMPILE_SCRIPT_BRANCH=main_v12.0
 ARG MET_TAR_FILE_VERSION_NAME=met-base-v3.3
 RUN echo "Pulling compilation script from MET branch ${MET_COMPILE_SCRIPT_BRANCH}" \
  && wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.${MET_TAR_FILE_VERSION_NAME}.tgz \

@@ -2,9 +2,13 @@ name: Build Docker Images
 
 on:
   push:
+    branches:
+      - develop
     tags:
       - v*
-      
+
+  workflow_dispatch:
+
 env:
   DOCKERHUB_BASE_REPO: dtcenter/met-base
   DOCKERHUB_UNIT_TEST_REPO: dtcenter/met-base-unit-test
@@ -16,23 +20,17 @@ jobs:
     name: Handle Docker Images
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Get tag name
-        id: get_tag_name
-        uses: devops-actions/action-get-tag@v1.0.2
-        with:
-          strip_v: false
+      - uses: actions/checkout@v4
 
       - name: Build Docker Image
         run: .github/jobs/build_docker_image.sh
         env:
-          GITHUB_TAG: ${{ steps.get_tag_name.outputs.tag }}
+          GITHUB_NAME: ${{ github.ref_name }}
 
       - name: Push Docker Image
         run: .github/jobs/push_docker_image.sh
         env:
-          GITHUB_TAG: ${{ steps.get_tag_name.outputs.tag }}
+          GITHUB_NAME: ${{ github.ref_name }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
