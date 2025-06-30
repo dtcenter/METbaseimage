@@ -88,7 +88,7 @@ RUN BLDOPTS="--global-option=build_ext --global-option=\"-R/usr/local/lib\" --gl
  && python3 -m pip install ${BLDOPTS} xarray==2023.1.0 \
  && export HDF5_DIR=/usr/local/ \
  && export NETCDF4_DIR=/usr/local/ \
- && python3 -m pip install ${BLDOPTS} netCDF4==1.6.2 \
+ && python3 -m pip install netCDF4==1.6.2 \
  && python3 -m pip install ${BLDOPTS} pyyaml==6.0.1 \
  && python3 -m pip install scipy==1.11.1
 
