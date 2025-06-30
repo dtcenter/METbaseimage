@@ -84,7 +84,7 @@ RUN echo "Pulling compilation script from MET branch ${MET_COMPILE_SCRIPT_BRANCH
 #
 RUN BLDOPTS="--global-option=build_ext --global-option=\"-R/usr/local/lib\" --global-option=\"-L/usr/local/lib\"" \
  && python3 -m pip install --upgrade pip \
- && python3 -m pip install ${BLDOPTS} numpy==1.24.2 \
+ && python3 -m pip install ${BLDOPTS} numpy==1.26.4 \
  && python3 -m pip install ${BLDOPTS} xarray==2023.1.0 \
  && export HDF5_DIR=/usr/local/ \
  && export NETCDF4_DIR=/usr/local/ \
