@@ -1,0 +1,61 @@
+name: Create Docker images for release
+
+on:
+  push:
+    branches:
+      - develop
+    tags:
+      - v*
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Comma-separated list of versions to build, e.g. "v3.3","v3.4"'
+        default: '"v3.4"'
+        required: true
+        type: string
+
+env:
+  DOCKERHUB_BASE_REPO: dtcenter/met-base
+  DOCKERHUB_UNIT_TEST_REPO: dtcenter/met-base-unit-test
+  DOCKERHUB_METVIEWER_REPO: dtcenter/met-base-metviewer
+
+jobs:
+
+  define-matrix:
+    name: Define Matrix
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get versions to build 
+        id: get_versions
+        run: |
+          if [ ${{ github.event_name != 'workflow_dispatch' }} ]; then
+            version_matrix=${{ github.event.inputs.version }}
+          else
+            version_martix=${{ fromJSON(format('[{0}]', inputs.release_version)) }}
+          fi
+          echo version_matrix=${version_matrix} >> $GITHUB_OUTPUT
+
+  build_and_push:
+    name: Build and Push Images
+    runs-on: ubuntu-latest
+    needs: define-matrix
+
+    strategy:
+      matrix:
+        version_name: ${{ needs.define-matrix.outputs.version_matrix }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: .github/jobs/build_docker_image.sh
+        env:
+          GITHUB_NAME: ${{ matrix.version_name }}
+
+      - name: Push Docker Image
+        run: .github/jobs/push_docker_image.sh
+        env:
+          GITHUB_NAME: ${{ matrix.version_name }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
