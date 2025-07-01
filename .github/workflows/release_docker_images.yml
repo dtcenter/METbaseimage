@@ -29,9 +29,9 @@ jobs:
         id: get_versions
         run: |
           if [ ${{ github.event_name != 'workflow_dispatch' }} ]; then
-            version_matrix=${{ github.event.inputs.version }}
+            version_matrix=${{ github.ref_name }}
           else
-            version_martix=${{ fromJSON(format('[{0}]', inputs.release_version)) }}
+            version_matrix=${{ fromJSON(format('[{0}]', inputs.release_version)) }}
           fi
           echo version_matrix=${version_matrix} >> $GITHUB_OUTPUT
 
