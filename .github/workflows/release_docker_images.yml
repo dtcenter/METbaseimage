@@ -33,7 +33,7 @@ jobs:
           else
             version_matrix=${{ fromJSON(format('[{0}]', inputs.release_version)) }}
           fi
-          echo Building versions: ${version_matrix}
+          echo Building versions: ${{ toJSON(version_matrix) }}
           echo version_matrix=${version_matrix} >> $GITHUB_OUTPUT
 
   build_and_push:
