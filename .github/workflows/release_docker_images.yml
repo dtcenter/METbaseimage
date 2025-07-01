@@ -29,7 +29,7 @@ jobs:
         id: get_versions
         run: |
           if [ ${{ github.event_name != 'workflow_dispatch' }} ]; then
-            version_matrix=${{ github.ref_name }}
+            version_matrix="${{ github.ref_name }}"
           else
             version_matrix=${{ fromJSON(format('[{0}]', inputs.release_version)) }}
           fi
@@ -42,7 +42,7 @@ jobs:
 
     strategy:
       matrix:
-        version_name: ${{ needs.define-matrix.outputs.version_matrix }}
+        version_name: ${{ fromJSON(needs.define-matrix.outputs.version_matrix) }}
 
     steps:
       - uses: actions/checkout@v4
