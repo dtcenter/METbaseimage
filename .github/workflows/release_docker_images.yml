@@ -13,6 +13,8 @@ on:
         default: '"v3.4"'
         required: true
         type: string
+  schedule:
+    - cron: "37 * * * *"
 
 env:
   DOCKERHUB_BASE_REPO: dtcenter/met-base
@@ -24,29 +26,27 @@ jobs:
   define-matrix:
     name: Define Matrix
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.get-versions.outputs.matrix }}
     steps:
       - name: Get versions to build 
-        id: get_versions
+        id: get-versions
         run: |
-          if [ ${{ github.event_name != 'workflow_dispatch' }} ]; then
-            version_matrix=${{ fromJSON(format('["{0}"]', github.ref_name)) }}
+          if [[ ${{ github.event_name }} == 'schedule' ]]; then
+            version_list="\"v3.3\",\"v3.4\""
+          elif [[ ${{ github.event_name }} == 'workflow_dispatch' ]]; then
+            version_list=${{ toJSON(inputs.release_version) }}
           else
-            version_matrix=${{ fromJSON(format('[{0}]', inputs.release_version)) }}
+            version_list=\"${{ toJSON(github.ref_name) }}\"
           fi
-          default_versions='"v3.3","v3.4"'
-          default_matrix=${{ fromJSON(format('[{0}]', default_versions)) }}
-          echo "Default versions: ${{ toJSON(default_matrix) }"
-          echo "Building versions: ${{ toJSON(version_matrix) }"
-          echo version_matrix=${version_matrix} >> $GITHUB_OUTPUT
+          echo "matrix={\"version\": [ ${version_list} ]}" >> $GITHUB_OUTPUT
 
   build_and_push:
     name: Build and Push Images
     runs-on: ubuntu-latest
     needs: define-matrix
-
     strategy:
-      matrix:
-        version_name: ${{ fromJSON(needs.define-matrix.outputs.version_matrix) }}
+      matrix: ${{ fromJSON(needs.define-matrix.outputs.matrix }}
 
     steps:
       - uses: actions/checkout@v4
