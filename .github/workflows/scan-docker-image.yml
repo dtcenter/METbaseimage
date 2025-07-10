@@ -17,6 +17,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
+
       - name: Create directories to store output
         run: |
           mkdir -p ${RUNNER_WORKSPACE}/logs
