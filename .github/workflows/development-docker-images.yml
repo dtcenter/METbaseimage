@@ -1,4 +1,4 @@
-name: Create Docker images for development 
+name: Create Development Docker Images
 
 on:
 
@@ -65,10 +65,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Create directories to store output
-        run: mkdir -p ${RUNNER_WORKSPACE}/logs
+        run: |
+          mkdir -p ${RUNNER_WORKSPACE}/logs
 
       - name: Build Docker Image
-        run: .github/jobs/build_docker_image.sh
+        run: |
+          .github/jobs/build_docker_image.sh
         env:
           GITHUB_NAME: ${{ needs.job_control.outputs.github_name }}
 
@@ -81,13 +83,15 @@ jobs:
           curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
 
       - name: Scan Docker Image
-        run: .github/jobs/scan_docker_image.sh
+        run: |
+          .github/jobs/scan_docker_image.sh
         env:
           GITHUB_NAME: ${{ needs.job_control.outputs.github_name }}
 
       - name: Push Docker Image
         if: ${{ needs.job_control.outputs.push_image == 'true' }}
-        run: .github/jobs/push_docker_image.sh
+        run: |
+          .github/jobs/push_docker_image.sh
         env:
           GITHUB_NAME: ${{ needs.job_control.outputs.github_name }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
