@@ -93,11 +93,16 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Copy log files into logs directory
+        if: always()
+        run: |
+          cp ${GITHUB_WORKSPACE}/*.log ${RUNNER_WORKSPACE}/logs/
+
       - name: Upload logs as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs_docker
+          name: logs
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 

@@ -39,11 +39,16 @@ jobs:
         run: |
           .github/jobs/scan_single_docker_image.sh ${{ inputs.image_name }}
 
+      - name: Copy log files into logs directory
+        if: always()
+        run: |
+          cp ${GITHUB_WORKSPACE}/*.log ${RUNNER_WORKSPACE}/logs/
+
       - name: Upload logs as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs_cve_scan 
-          path: ${RUNNER_WORKSPACE}/logs
+          name: logs
+          path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
