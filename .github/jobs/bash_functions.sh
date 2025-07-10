@@ -25,3 +25,17 @@ function time_command {
   fi
   return $error
 }
+
+# utilty function to scan a Docker image for vulnerabilities
+function cve_scan_image {
+  echo "Scanning image $1"
+  LOG_FILE="${GITHUB_WORKSPACE}/logs/CVE_Scan_`echo $1 | sed 's%/%_%g'`.log"
+  time_command "grype $1 > ${LOG_FILE} 2>&1"
+  N_CRITICAL=`grep "Critical" ${LOG_FILE} | wc -l`
+  if [ $N_CRITICAL > 0 ]; then
+    echo "WARNING: Found ${N_CRITICAL} CVEs for image $1 in ${LOG_FILE}:"
+    echo
+    egrep "SEVERITY|Critical" ${LOG_FILE}
+    echo
+  fi
+}
