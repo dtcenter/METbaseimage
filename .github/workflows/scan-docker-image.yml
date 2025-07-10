@@ -17,8 +17,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-
       - name: Create directories to store output
         run: |
           mkdir -p ${RUNNER_WORKSPACE}/logs
@@ -36,13 +34,14 @@ jobs:
           curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
 
       - name: Scan Docker Image
-        run: .github/jobs/scan_single_docker_image.sh ${{ inputs.image_name }}
+        run: |
+          .github/jobs/scan_single_docker_image.sh ${{ inputs.image_name }}
 
       - name: Upload logs as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: logs_cve_scan 
-          path: ${{ runner.workspace }}/logs
+          path: ${RUNNER_WORKSPACE}/logs
           if-no-files-found: ignore
 
