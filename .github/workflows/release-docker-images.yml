@@ -1,9 +1,11 @@
 name: Create Docker images for release
 
 on:
+
   push:
     tags:
       - v*
+
   workflow_dispatch:
     inputs:
       release_version:
@@ -11,6 +13,7 @@ on:
         default: '"v3.4"'
         required: true
         type: string
+
   schedule:
     - cron: "30 00 * * 0"
 
