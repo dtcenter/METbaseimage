@@ -1,5 +1,6 @@
+ARG MET_BASE_REPO
 ARG MET_BASE_TAG
-FROM dtcenter/met-base:${MET_BASE_TAG}
+FROM ${MET_BASE_REPO}:${MET_BASE_TAG}
 LABEL maintainer="John Halley Gotway <johnhg@ucar.edu>"
 
 #
