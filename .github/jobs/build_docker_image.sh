@@ -4,6 +4,7 @@ source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
 
 # Required environment variables:
 #   $GITHUB_WORKSPACE is the full path to METbaseimage.
+#   $DOCKERFILE_DIR is the directory containing Dockerfiles.
 #   $GITHUB_NAME is the tag or branch name (e.g. vX.Y or develop).
 #   $DOCKERHUB_BASE_REPO is dtcenter/met-base.
 #   $DOCKERHUB_UNIT_TEST_REPO is dtcenter/met-base-unit-test.
@@ -11,7 +12,7 @@ source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
 
 # Build dtcenter/met-base
 DOCKERHUB_TAG_BASE=${DOCKERHUB_BASE_REPO}:${GITHUB_NAME}
-DOCKERFILE_PATH=${GITHUB_WORKSPACE}/Dockerfile
+DOCKERFILE_PATH=${DOCKERFILE_DIR}/Dockerfile
 CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build_met_base_image.log
 
 time_command docker build -t ${DOCKERHUB_TAG_BASE} \
@@ -23,7 +24,7 @@ fi
 
 # Build dtcenter/met-base-unit-test
 DOCKERHUB_TAG_UNIT_TEST=${DOCKERHUB_UNIT_TEST_REPO}:${GITHUB_NAME}
-DOCKERFILE_PATH=${GITHUB_WORKSPACE}/Dockerfile.unit_test_env
+DOCKERFILE_PATH=${DOCKERFILE_DIR}/Dockerfile.unit_test_env
 CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build_met_base_unit_test_env_image.log
 
 time_command docker build -t ${DOCKERHUB_TAG_UNIT_TEST} \
@@ -37,7 +38,7 @@ fi
 
 # Build dtcenter/met-base-metviewer
 DOCKERHUB_TAG_METVIEWER=${DOCKERHUB_METVIEWER_REPO}:${GITHUB_NAME}
-DOCKERFILE_PATH=${GITHUB_WORKSPACE}/Dockerfile.metviewer
+DOCKERFILE_PATH=${DOCKERFILE_DIR}/Dockerfile.metviewer
 CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build_met_base_metviewer_image.log
 
 time_command docker build -t ${DOCKERHUB_TAG_METVIEWER} \

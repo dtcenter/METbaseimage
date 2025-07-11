@@ -72,6 +72,7 @@ jobs:
         run: |
           .github/jobs/build_docker_image.sh
         env:
+          DOCKERFILE_DIR: ${GITHUB_WORKSPACE}
           GITHUB_NAME: ${{ needs.job_control.outputs.github_name }}
 
       - name: Install Syft

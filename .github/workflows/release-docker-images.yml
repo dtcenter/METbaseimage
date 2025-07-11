@@ -51,8 +51,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
         with:
           ref: ${{ matrix.version }}
+          path: ${{ matrix.version }}
 
       - name: Create directories to store output
         run: |
@@ -62,6 +65,7 @@ jobs:
         run: |
           .github/jobs/build_docker_image.sh
         env:
+          DOCKERFILE_DIR: ${GITHUB_WORKSPACE}/${{ matrix.version }}
           GITHUB_NAME: ${{ matrix.version }}
 
       - name: Install Syft
