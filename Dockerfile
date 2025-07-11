@@ -5,7 +5,7 @@ LABEL maintainer="George McCabe <mccabe@ucar.edu>"
 ARG MET_COMPILE_SCRIPT_BRANCH=main_v12.1
 ARG MET_TAR_FILE_VERSION_NAME=met-base-v3.4
 
-ENV PYTHON_VER=3.12.0
+ENV PYTHON_VER=3.12.11
 
 ENV CC=/usr/bin/gcc
 ENV CXX=/usr/bin/g++
