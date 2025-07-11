@@ -64,6 +64,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.job_control.outputs.github_name }}
+          path: ${{ needs.job_control.outputs.github_name }}
+
       - name: Create directories to store output
         run: |
           mkdir -p ${RUNNER_WORKSPACE}/logs
@@ -72,7 +77,6 @@ jobs:
         run: |
           .github/jobs/build_docker_image.sh
         env:
-          DOCKERFILE_DIR: ${GITHUB_WORKSPACE}
           GITHUB_NAME: ${{ needs.job_control.outputs.github_name }}
 
       - name: Install Syft
