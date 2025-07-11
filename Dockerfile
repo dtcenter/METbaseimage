@@ -10,7 +10,7 @@ ENV CXX /usr/bin/g++
 ENV FC  /usr/bin/gfortran
 ENV F77 /usr/bin/gfortran
 
-ENV PYTHON_VER 3.10.4
+ENV PYTHON_VER 3.10.18
 
 ENV GSFONT_URL https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/ghostscript-fonts-std-8.11.tar.gz
 
