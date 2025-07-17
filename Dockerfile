@@ -12,7 +12,7 @@ ENV F77 /usr/bin/gfortran
 
 #
 # CVE-2022-37454
-#   Switch from Python version 3.10.4 to 3.10.18
+#   Switch from Python 3.10.4 to 3.10.18
 #
 ENV PYTHON_VER 3.10.18
 
@@ -47,7 +47,7 @@ RUN echo "Downloading GhostScript fonts from ${GSFONT_URL} into /usr/local/share
 
 #
 # CVE-2023-45853
-#   Install zlib version 1.3.1 from source
+#   Install zlib 1.3.1 from source to avoid CVEs in the zlib1g-dev 1.2.13 package
 #
 RUN echo "Dowloading zlib from ${ZLIB_URL}" \
  && wget ${ZLIB_URL} \
@@ -115,7 +115,7 @@ RUN BLDOPTS="--global-option=build_ext --global-option=\"-R/usr/local/lib\" --gl
 RUN ldconfig
 
 #
-# Remove additional packages containing Critical CVEs:
+# Remove packages containing Critical CVEs:
 #   NAME              INSTALLED               FIXED IN    TYPE VULNERABILITY  SEVERITY EPSS % RISK
 #   zlib1g-dev        1:1.2.13.dfsg-1         (won't fix) deb  CVE-2023-45853 Critical 70.89  0.6
 #   libopenexr-3-1-30 3.1.5-5                 (won't fix) deb  CVE-2023-5841  Critical 70.03  0.6
