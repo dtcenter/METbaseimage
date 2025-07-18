@@ -86,8 +86,8 @@ jobs:
           .github/jobs/push_docker_image.sh
         env:
           GITHUB_NAME: ${{ matrix.version }}
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          DOCKER_USERNAME: 'dtcenter'
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
 
       - name: Copy log files into logs directory
         if: always()
