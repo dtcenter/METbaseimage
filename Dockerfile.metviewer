@@ -82,3 +82,14 @@ RUN echo "Install GEOS - needed for cartopy" &&\
   && pip install python-dateutil \
   && pip install opencv-python \
   && pip install pandas
+
+#
+# Remove packages containing Critical CVEs:
+#   NAME         INSTALLED               FIXED IN    TYPE VULNERABILITY  SEVERITY EPSS %        RISK
+#   zlib1g-dev   1:1.2.13.dfsg-1         (won't fix) deb  CVE-2023-45853 Critical 0.7% (70th)   0.6    
+#   libxml2      2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49794 Critical < 0.1% (23rd) < 0.1  
+#   libxml2      2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49796 Critical < 0.1% (18th) < 0.1  
+#   libfcgi-bin  2.4.2-2                 (won't fix) deb  CVE-2025-23016 Critical < 0.1% (11th) < 0.1  
+#   libfcgi0ldbl 2.4.2-2                 (won't fix) deb  CVE-2025-23016 Critical < 0.1% (11th) < 0.1 
+#
+RUN apt remove -y zlib1g-dev libxml2 libfcgi-bin libfcgi0ldbl
