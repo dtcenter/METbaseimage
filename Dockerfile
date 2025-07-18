@@ -17,7 +17,7 @@ ENV FC=/usr/bin/gfortran
 ENV F77=/usr/bin/gfortran
 
 ENV GSFONT_URL=https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/ghostscript-fonts-std-8.11.tar.gz
-ENV ZLIB_URL https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/zlib-1.3.1.tar.gz
+ENV ZLIB_URL=https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/zlib-1.3.1.tar.gz
 ENV MET_FONT_DIR=/usr/local/share/met/fonts
 
 WORKDIR /met
@@ -41,10 +41,10 @@ RUN \
  && echo "Dowloading zlib from ${ZLIB_URL}" &&\
     wget ${ZLIB_URL} &&\
     tar xzf zlib-1.3.1.tar.gz &&\
-    cd zlib-1.3.1 &&\
+    (cd zlib-1.3.1 &&\
     ./configure --enable-shared &&\
     make -j `nproc` &&\
-    make install \
+    make install) \
  && echo "Downloading GhostScript fonts from ${GSFONT_URL} into /usr/local/share/met" &&\
     mkdir -p /usr/local/share/met &&\
     curl -SL ${GSFONT_URL} | tar zxC /usr/local/share/met \
