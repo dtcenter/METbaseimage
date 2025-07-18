@@ -36,7 +36,7 @@ function cve_scan_image {
   CMD_LOGFILE="${GITHUB_WORKSPACE}/CVE_Scan_`echo $1 | sed 's%[/,:]%_%g'`.log"
 
   # print CVE counts
-  cve_summary="Found $(grep -E " Critical | High | Medium | Low | Negligible " $1 | wc -l) CVEs for image $1: "
+  cve_summary="Found $(grep -E " Critical | High | Medium | Low | Negligible " $CMD_LOGFILE | wc -l) CVEs for image $1: "
   for status in Critical High Medium Low Negligible; do
     if [[ $status != "Critical" ]]; then
       cve_summary+=", " 
