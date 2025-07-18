@@ -43,11 +43,14 @@ jobs:
         id: job_status 
         run: |
           if [[ ${{ github.event_name }} == 'workflow_dispatch' ]]; then
-            github_name=${{ toJSON(inputs.github_name) }}
-            push_image=${{ toJSON(inputs.push_image) }}
+            github_name=${{ inputs.github_name }}
+            push_image=${{ inputs.push_image }}
+          else if [[ ${{ github.event_name }} == 'pull_request' ]]; then
+            github_name="pull/${{ github.event.pull_request.number }}/merge"
+            push_image='true'
           else
-            github_name=${{ toJSON(github.ref_name) }}
-            push_image=true
+            github_name=${{ github.ref_name }}
+            push_image='true'
           fi 
           echo "github_name=${github_name}" >> $GITHUB_OUTPUT
           echo "push_image=${push_image}" >> $GITHUB_OUTPUT
