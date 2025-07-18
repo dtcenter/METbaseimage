@@ -46,7 +46,7 @@ jobs:
             github_name=${{ inputs.github_name }}
             push_image=${{ inputs.push_image }}
           elif [[ ${{ github.event_name }} == 'pull_request' ]]; then
-            github_name=${{ github.ref }}
+            github_name=${{ github.sha }}
             push_image='true'
           else
             github_name=${{ github.ref_name }}
