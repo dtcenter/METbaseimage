@@ -41,7 +41,7 @@ function cve_scan_image {
     if [[ $status != "Critical" ]]; then
       cve_summary+=", " 
     fi
-    cve_summary+="$(grep $status $1 | wc -l) ${status}"
+    cve_summary+="$(grep $status $CMD_LOGFILE | wc -l) ${status}"
   done
   echo $cve_summary
 
