@@ -36,10 +36,16 @@ function cve_scan_image {
   CMD_LOGFILE="${GITHUB_WORKSPACE}/CVE_Scan_`echo $1 | sed 's%[/,:]%_%g'`.log"
 
   # print CVE counts
-  echo "Found $(grep -E " Critical | High | Medium | Low | Negligible " $CMD_LOGFILE | wc -l) CVEs for image $1"
-  grep -E -o " Critical | High | Medium | Low | Negligible " $CMD_LOGFILE | sort | uniq -c
+  cve_summary="Found $(grep -E " Critical | High | Medium | Low | Negligible " $1 | wc -l) CVEs for image $1: "
+  for status in Critical High Medium Low Negligible; do
+    if [[ $status != "Critical" ]]; then
+      cve_summary+=", " 
+    fi
+    cve_summary+="$(grep $status $1 | wc -l) ${status}"
+  done
+  echo $cve_summary
 
-  # return bad status for non-zero Criticals
+  # print critical CVEs
   N_CRITICAL=`grep " Critical " ${CMD_LOGFILE} | wc -l`
   if [ ${N_CRITICAL} -gt 0 ]; then
     echo "WARNING: Found ${N_CRITICAL} Critical CVEs for image $1 in ${CMD_LOGFILE}"
