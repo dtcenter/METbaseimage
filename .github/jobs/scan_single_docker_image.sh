@@ -2,6 +2,6 @@
 
 source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
 
-cve_scan_image $1
-
-return 0
+if ! cve_scan_image $1; then
+  echo "WARNING: Critical CVEs found!"
+fi
