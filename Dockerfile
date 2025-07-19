@@ -10,9 +10,14 @@ ENV CXX /usr/bin/g++
 ENV FC  /usr/bin/gfortran
 ENV F77 /usr/bin/gfortran
 
-ENV PYTHON_VER 3.10.4
+#
+# CVE-2022-37454
+#   Switch from Python 3.10.4 to 3.10.18
+#
+ENV PYTHON_VER 3.10.18
 
 ENV GSFONT_URL https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/ghostscript-fonts-std-8.11.tar.gz
+ENV ZLIB_URL https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/zlib-1.3.1.tar.gz
 
 #
 # Set up the environment for interactive bash shell
@@ -31,14 +36,26 @@ ENV MET_FONT_DIR /usr/local/share/met/fonts
 RUN apt update && apt -y upgrade \
  && apt install -y build-essential gfortran wget unzip curl imagemagick \
     libcurl4-gnutls-dev m4 git automake flex bison libjpeg-dev libpixman-1-dev \
-    emacs vim less \
+    vim less \
     libreadline-dev libncursesw5-dev libssl-dev tk-dev \
-    libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev \
+    libgdbm-dev libc6-dev libbz2-dev libffi-dev \
     cmake libtiff-dev sqlite3 libsqlite3-dev
 
 RUN echo "Downloading GhostScript fonts from ${GSFONT_URL} into /usr/local/share/met" \
  && mkdir -p /usr/local/share/met \
  && curl -SL ${GSFONT_URL} | tar zxC /usr/local/share/met
+
+#
+# CVE-2023-45853
+#   Install zlib 1.3.1 from source to avoid CVEs in the zlib1g-dev 1.2.13 package
+#
+RUN echo "Dowloading zlib from ${ZLIB_URL}" \
+ && wget ${ZLIB_URL} \
+ && tar xzf zlib-1.3.1.tar.gz \
+ && cd zlib-1.3.1 \
+ && ./configure --enable-shared \
+ && make -j `nproc` \
+ && make install
 
 #
 # Fix rules for ghostscript files in convert
@@ -96,4 +113,16 @@ RUN BLDOPTS="--global-option=build_ext --global-option=\"-R/usr/local/lib\" --gl
 # Run linker configuration
 #
 RUN ldconfig
+
+#
+# Remove packages containing Critical CVEs:
+#   NAME              INSTALLED               FIXED IN    TYPE VULNERABILITY  SEVERITY EPSS % RISK
+#   zlib1g-dev        1:1.2.13.dfsg-1         (won't fix) deb  CVE-2023-45853 Critical 70.89  0.6
+#   libopenexr-3-1-30 3.1.5-5                 (won't fix) deb  CVE-2023-5841  Critical 70.03  0.6
+#   libaom3           3.6.0-1+deb12u1         (won't fix) deb  CVE-2023-6879  Critical 37.08  0.1
+#   libxml2           2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49794 Critical 23.45  < 0.1
+#   libxml2           2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49796 Critical 18.40  < 0.1
+#   libarchive13      3.6.2-1+deb12u2         (won't fix) deb  CVE-2025-5914  Critical 10.77  < 0.1
+#
+RUN apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13
 
