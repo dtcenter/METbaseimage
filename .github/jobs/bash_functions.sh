@@ -2,9 +2,10 @@
 
 # utility function to run command get log the time it took to run
 # if CMD_LOGFILE is set, send output to that file and unset var
+# ::group:: and ::endgroup:: create collapsible log groups on GitHub Actions
 function time_command {
   local start_seconds=$SECONDS
-  echo "RUNNING: $*"
+  echo "::group::RUNNING: $*"
 
   local error
   # pipe output to log file if set
@@ -20,6 +21,7 @@ function time_command {
 
   local duration=$(( SECONDS - start_seconds ))
   echo "TIMING: Command took `printf '%02d' $(($duration / 60))`:`printf '%02d' $(($duration % 60))` (MM:SS): '$*'"
+  echo "::endgroup::"
   if [ ${error} -ne 0 ]; then
     echo "ERROR: '$*' exited with status = ${error}"
   fi
@@ -32,11 +34,26 @@ function cve_scan_image {
   CMD_LOGFILE="${GITHUB_WORKSPACE}/CVE_Scan_`echo $1 | sed 's%[/,:]%_%g'`.log"
   time_command grype $1
   CMD_LOGFILE="${GITHUB_WORKSPACE}/CVE_Scan_`echo $1 | sed 's%[/,:]%_%g'`.log"
-  N_CRITICAL=`grep "Critical" ${CMD_LOGFILE} | wc -l`
+
+  # print CVE counts
+  cve_summary="Found $(grep -E " Critical | High | Medium | Low | Negligible " $CMD_LOGFILE | wc -l) CVEs for image $1: "
+  for status in Critical High Medium Low Negligible; do
+    if [[ $status != "Critical" ]]; then
+      cve_summary+=", " 
+    fi
+    cve_summary+="$(grep $status $CMD_LOGFILE | wc -l) ${status}"
+  done
+  echo $cve_summary
+
+  # print critical CVEs
+  N_CRITICAL=`grep " Critical " ${CMD_LOGFILE} | wc -l`
   if [ ${N_CRITICAL} -gt 0 ]; then
-    echo "WARNING: Found ${N_CRITICAL} CVEs for image $1 in ${CMD_LOGFILE}"
+    echo "WARNING: Found ${N_CRITICAL} Critical CVEs for image $1 in ${CMD_LOGFILE}"
     echo
     egrep "SEVERITY|Critical" ${CMD_LOGFILE}
     echo
+    return 1
   fi
+
+  return 0
 }
