@@ -1,0 +1,104 @@
+name: Create Release Docker Images
+
+on:
+
+  push:
+    tags:
+      - v*
+
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Comma-separated list of versions to build, e.g. "v3.3","v3.4"'
+        default: '"v3.4"'
+        required: true
+        type: string
+
+  schedule:
+    - cron: "30 00 * * 0"
+
+env:
+  DOCKERHUB_BASE_REPO: dtcenter/met-base
+  DOCKERHUB_UNIT_TEST_REPO: dtcenter/met-base-unit-test
+  DOCKERHUB_METVIEWER_REPO: dtcenter/met-base-metviewer
+
+jobs:
+
+  define-matrix:
+    name: Define Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.get-versions.outputs.matrix }}
+    steps:
+      - name: Get versions to build 
+        id: get-versions
+        run: |
+          if [[ ${{ github.event_name }} == 'schedule' ]]; then
+            version_list="\"v3.3\",\"v3.4\""
+          elif [[ ${{ github.event_name }} == 'workflow_dispatch' ]]; then
+            version_list=${{ toJSON(inputs.release_version) }}
+          else
+            version_list=\"${{ toJSON(github.ref_name) }}\"
+          fi
+          echo "matrix={\"version\": [ ${version_list} ]}" >> $GITHUB_OUTPUT
+
+  build_scan_and_push:
+    name: Build, Scan, and Push Images
+    runs-on: ubuntu-latest
+    needs: define-matrix
+    strategy:
+      matrix: ${{ fromJSON(needs.define-matrix.outputs.matrix) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.version }}
+          path: ${{ matrix.version }}
+
+      - name: Create directories to store output
+        run: |
+          mkdir -p ${RUNNER_WORKSPACE}/logs
+
+      - name: Build Docker Image
+        run: |
+          .github/jobs/build_docker_image.sh
+        env:
+          GITHUB_NAME: ${{ matrix.version }}
+
+      - name: Install Syft
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Install Grype
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Scan Docker Image
+        run: |
+          .github/jobs/scan_docker_image.sh
+        env:
+          GITHUB_NAME: ${{ matrix.version }}
+
+      - name: Push Docker Image
+        run: |
+          .github/jobs/push_docker_image.sh
+        env:
+          GITHUB_NAME: ${{ matrix.version }}
+          DOCKER_USERNAME: 'dtcenter'
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Copy log files into logs directory
+        if: always()
+        run: |
+          cp ${GITHUB_WORKSPACE}/*.log ${RUNNER_WORKSPACE}/logs/
+
+      - name: Upload logs as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs_${{ matrix.version }}
+          path: ${{ runner.workspace }}/logs
+          if-no-files-found: ignore
+
