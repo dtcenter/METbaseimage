@@ -8,10 +8,26 @@ Please see the [MET website](https://dtcenter.org/community-code/model-evaluatio
 Version History
 ===============
 
+v3.4.1
+------
+
+* Address Critical CVEs in METbaseimage ([Internal #61](https://github.com/dtcenter/METplus-Internal/issues/61))
+  * Python 3.12.11
+  * zlib 1.3.1
+  * nco 5.3.3
+
 v3.4
 ----
 
 * Python 3.12.0 (#30)
+
+v3.3.1
+------
+
+* Address Critical CVEs in METbaseimage ([Internal #61](https://github.com/dtcenter/METplus-Internal/issues/61))
+  * Python 3.10.18
+  * zlib 1.3.1
+  * nco 5.3.3
 
 v3.3
 ----
