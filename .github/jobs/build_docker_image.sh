@@ -18,7 +18,9 @@ CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build_met_base_image.log
 
 if ! time_command docker build -t ${DOCKERHUB_TAG_BASE} \
      -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}; then
+  echo "::group::${GITHUB_WORKSPACE}/docker_build_met_base_image.log"
   cat ${GITHUB_WORKSPACE}/docker_build_met_base_image.log
+  echo "::endgroup::"
   exit 1
 fi
 
@@ -31,7 +33,9 @@ if ! time_command docker build -t ${DOCKERHUB_TAG_UNIT_TEST} \
      --build-arg MET_BASE_REPO=${DOCKERHUB_BASE_REPO} \
      --build-arg MET_BASE_TAG=${MET_BASE_TAG} \
      -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}; then
+  echo "::group::${GITHUB_WORKSPACE}/docker_build_met_unit_test_env_image.log"
   cat ${GITHUB_WORKSPACE}/docker_build_met_base_unit_test_env_image.log
+  echo "::endgroup::"
   exit 1
 fi
 
@@ -44,6 +48,8 @@ if ! time_command docker build -t ${DOCKERHUB_TAG_METVIEWER} \
      --build-arg MET_BASE_REPO=${DOCKERHUB_BASE_REPO} \
      --build-arg MET_BASE_TAG=${MET_BASE_TAG} \
      -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}; then
+  echo "::group::${GITHUB_WORKSPACE}/docker_build_met_base_metviewer_image.log"
   cat ${GITHUB_WORKSPACE}/docker_build_met_base_metviewer_image.log
+  echo "::endgroup::"
   exit 1
 fi
