@@ -84,13 +84,43 @@ RUN \
 #   libxml2           2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49796 Critical 18.40  < 0.1
 #   libarchive13      3.6.2-1+deb12u2         (won't fix) deb  CVE-2025-5914  Critical 10.77  < 0.1
 #
-# - Install imagemagick after removal because it was removed as a dependency
+# - Install imagemagick after removal because it was removed as a dependency.
+#   Must install from source with some features like xml excluded because version from apt re-installs problematic
+#   packages that contain critical CVEs.
 #
 RUN apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 \
- && apt install -y imagemagick && apt clean \
+ && echo "Building ImageMagick without XML support" &&\
+    wget https://imagemagick.org/archive/ImageMagick-7.1.2-0.tar.gz &&\
+    tar xzf ImageMagick-7.1.2-0.tar.gz &&\
+    cd ImageMagick-7.1.2-0 &&\
+    ./configure \
+    --without-xml \
+    --without-dps \
+    --without-djvu \
+    --without-fftw \
+    --without-fpx \
+    --without-gslib \
+    --without-gvc \
+    --without-jbig \
+    --without-jpeg \
+    --without-lcms \
+    --without-lqr \
+    --without-lzma \
+    --without-openexr \
+    --without-pango \
+    --without-rsvg \
+    --without-webp \
+    --without-x \
+    --disable-shared \
+    --enable-static &&\
+    make -j $(nproc) &&\
+    make install &&\
+    ldconfig &&\
+    cd .. &&\
+    rm -rf ImageMagick-7.1.2-0* \
  && echo "Fix rules for ghostscript files in convert" &&\
     echo "See: https://en.linuxportal.info/tutorials/troubleshooting/how-to-fix-errors-from-imagemagick-imagick-conversion-system-security-policy" &&\
-    sed -i 's/policy domain="coder" rights="none" pattern="PS/policy domain="coder" rights="read | write" pattern="PS/g' /etc/ImageMagick-6/policy.xml &&\
-    sed -i 's/policy domain="coder" rights="none" pattern="EPS"/policy domain="coder" rights="read | write" pattern="EPS"/g' /etc/ImageMagick-6/policy.xml &&\
-    sed -i 's/policy domain="coder" rights="none" pattern="PDF"/policy domain="coder" rights="read | write" pattern="PDF"/g' /etc/ImageMagick-6/policy.xml &&\
-    sed -i 's/policy domain="coder" rights="none" pattern="XPS"/policy domain="coder" rights="read | write" pattern="XPS"/g' /etc/ImageMagick-6/policy.xml
+    sed -i 's/policy domain="coder" rights="none" pattern="PS/policy domain="coder" rights="read | write" pattern="PS/g' /usr/local/etc/ImageMagick-7/policy.xml &&\
+    sed -i 's/policy domain="coder" rights="none" pattern="EPS"/policy domain="coder" rights="read | write" pattern="EPS"/g' /usr/local/etc/ImageMagick-7/policy.xml &&\
+    sed -i 's/policy domain="coder" rights="none" pattern="PDF"/policy domain="coder" rights="read | write" pattern="PDF"/g' /usr/local/etc/ImageMagick-7/policy.xml &&\
+    sed -i 's/policy domain="coder" rights="none" pattern="XPS"/policy domain="coder" rights="read | write" pattern="XPS"/g' /usr/local/etc/ImageMagick-7/policy.xml
