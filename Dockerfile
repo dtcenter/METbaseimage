@@ -48,12 +48,6 @@ RUN \
  && echo "Downloading GhostScript fonts from ${GSFONT_URL} into /usr/local/share/met" &&\
     mkdir -p /usr/local/share/met &&\
     curl -SL ${GSFONT_URL} | tar zxC /usr/local/share/met \
- && echo "Fix rules for ghostscript files in convert" &&\
-    echo "See: https://en.linuxportal.info/tutorials/troubleshooting/how-to-fix-errors-from-imagemagick-imagick-conversion-system-security-policy" &&\
-    sed -i 's/policy domain="coder" rights="none" pattern="PS/policy domain="coder" rights="read | write" pattern="PS/g' /etc/ImageMagick-6/policy.xml &&\
-    sed -i 's/policy domain="coder" rights="none" pattern="EPS"/policy domain="coder" rights="read | write" pattern="EPS"/g' /etc/ImageMagick-6/policy.xml &&\
-    sed -i 's/policy domain="coder" rights="none" pattern="PDF"/policy domain="coder" rights="read | write" pattern="PDF"/g' /etc/ImageMagick-6/policy.xml &&\
-    sed -i 's/policy domain="coder" rights="none" pattern="XPS"/policy domain="coder" rights="read | write" pattern="XPS"/g' /etc/ImageMagick-6/policy.xml \
  && echo "Install Python from source" &&\
     wget https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tgz &&\
     tar xzf Python-${PYTHON_VER}.tgz &&\
@@ -93,4 +87,10 @@ RUN \
 # - Install imagemagick after removal because it was removed as a dependency
 #
 RUN apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 \
- && apt install -y imagemagick && apt clean
+ && apt install -y imagemagick && apt clean \
+ && echo "Fix rules for ghostscript files in convert" &&\
+    echo "See: https://en.linuxportal.info/tutorials/troubleshooting/how-to-fix-errors-from-imagemagick-imagick-conversion-system-security-policy" &&\
+    sed -i 's/policy domain="coder" rights="none" pattern="PS/policy domain="coder" rights="read | write" pattern="PS/g' /etc/ImageMagick-6/policy.xml &&\
+    sed -i 's/policy domain="coder" rights="none" pattern="EPS"/policy domain="coder" rights="read | write" pattern="EPS"/g' /etc/ImageMagick-6/policy.xml &&\
+    sed -i 's/policy domain="coder" rights="none" pattern="PDF"/policy domain="coder" rights="read | write" pattern="PDF"/g' /etc/ImageMagick-6/policy.xml &&\
+    sed -i 's/policy domain="coder" rights="none" pattern="XPS"/policy domain="coder" rights="read | write" pattern="XPS"/g' /etc/ImageMagick-6/policy.xml
