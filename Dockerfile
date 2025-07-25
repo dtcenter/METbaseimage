@@ -32,7 +32,7 @@ RUN \
  && echo "Installing required system tools" &&\
     apt update && apt -y upgrade &&\
     apt install -y automake bison build-essential cmake curl flex \
-     gfortran git imagemagick less libbz2-dev libc6-dev libcurl4-gnutls-dev \
+     gfortran git less libbz2-dev libc6-dev libcurl4-gnutls-dev \
      libffi-dev libgdbm-dev libjpeg-dev libncursesw5-dev libopenblas-dev \
      libpixman-1-dev libreadline-dev libsqlite3-dev libssl-dev libtiff-dev m4 \
      sqlite3 tk-dev unzip vim wget \
@@ -81,7 +81,7 @@ RUN \
     ldconfig
 
 #
-# Remove packages containing Critical CVEs:
+# - Remove packages containing Critical CVEs:
 #   NAME              INSTALLED               FIXED IN    TYPE VULNERABILITY  SEVERITY EPSS % RISK
 #   zlib1g-dev        1:1.2.13.dfsg-1         (won't fix) deb  CVE-2023-45853 Critical 70.89  0.6
 #   libopenexr-3-1-30 3.1.5-5                 (won't fix) deb  CVE-2023-5841  Critical 70.03  0.6
@@ -90,4 +90,7 @@ RUN \
 #   libxml2           2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49796 Critical 18.40  < 0.1
 #   libarchive13      3.6.2-1+deb12u2         (won't fix) deb  CVE-2025-5914  Critical 10.77  < 0.1
 #
-RUN apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13
+# - Install imagemagick after removal because it was removed as a dependency
+#
+RUN apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 \
+ && apt install -y imagemagick && apt clean
