@@ -16,8 +16,8 @@ DOCKERHUB_TAG_BASE=$(get_dockerhub_tag ${DOCKERHUB_BASE_REPO} ${GITHUB_NAME})
 DOCKERFILE_PATH=${GITHUB_WORKSPACE}/${GITHUB_NAME}/Dockerfile
 CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build_met_base_image.log
 
-if ! $(time_command docker build -t ${DOCKERHUB_TAG_BASE} \
-       -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}); then
+if ! time_command docker build -t ${DOCKERHUB_TAG_BASE} \
+     -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}; then
   cat ${GITHUB_WORKSPACE}/docker_build_met_base_image.log
   exit 1
 fi
@@ -27,10 +27,10 @@ DOCKERHUB_TAG_UNIT_TEST=$(get_dockerhub_tag ${DOCKERHUB_UNIT_TEST_REPO} ${GITHUB
 DOCKERFILE_PATH=${GITHUB_WORKSPACE}/${GITHUB_NAME}/Dockerfile.unit_test_env
 CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build_met_base_unit_test_env_image.log
 
-if ! $(time_command docker build -t ${DOCKERHUB_TAG_UNIT_TEST} \
-       --build-arg MET_BASE_REPO=${DOCKERHUB_BASE_REPO} \
-       --build-arg MET_BASE_TAG=${MET_BASE_TAG} \
-       -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}); then
+if ! time_command docker build -t ${DOCKERHUB_TAG_UNIT_TEST} \
+     --build-arg MET_BASE_REPO=${DOCKERHUB_BASE_REPO} \
+     --build-arg MET_BASE_TAG=${MET_BASE_TAG} \
+     -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}; then
   cat ${GITHUB_WORKSPACE}/docker_build_met_base_unit_test_env_image.log
   exit 1
 fi
@@ -40,10 +40,10 @@ DOCKERHUB_TAG_METVIEWER=$(get_dockerhub_tag ${DOCKERHUB_METVIEWER_REPO} ${GITHUB
 DOCKERFILE_PATH=${GITHUB_WORKSPACE}/${GITHUB_NAME}/Dockerfile.metviewer
 CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build_met_base_metviewer_image.log
 
-if ! $(time_command docker build -t ${DOCKERHUB_TAG_METVIEWER} \
-       --build-arg MET_BASE_REPO=${DOCKERHUB_BASE_REPO} \
-       --build-arg MET_BASE_TAG=${MET_BASE_TAG} \
-       -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}); then
+if ! time_command docker build -t ${DOCKERHUB_TAG_METVIEWER} \
+     --build-arg MET_BASE_REPO=${DOCKERHUB_BASE_REPO} \
+     --build-arg MET_BASE_TAG=${MET_BASE_TAG} \
+     -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}; then
   cat ${GITHUB_WORKSPACE}/docker_build_met_base_metviewer_image.log
   exit 1
 fi
