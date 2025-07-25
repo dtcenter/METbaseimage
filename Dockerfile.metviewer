@@ -45,6 +45,18 @@ RUN \
 
 WORKDIR /tmp
 
+#
+# - Install Python packages needed for METplus Analysis Python tools
+# - Remove packages containing Critical CVEs:
+#   NAME         INSTALLED               FIXED IN    TYPE VULNERABILITY  SEVERITY EPSS %        RISK
+#   zlib1g-dev   1:1.2.13.dfsg-1         (won't fix) deb  CVE-2023-45853 Critical 0.7% (70th)   0.6
+#   libxml2      2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49794 Critical < 0.1% (23rd) < 0.1
+#   libxml2      2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49796 Critical < 0.1% (18th) < 0.1
+#   libfcgi-bin  2.4.2-2                 (won't fix) deb  CVE-2025-23016 Critical < 0.1% (11th) < 0.1
+#   libfcgi0ldbl 2.4.2-2                 (won't fix) deb  CVE-2025-23016 Critical < 0.1% (11th) < 0.1
+#
+# - Install missing chrome dependencies that are needed by plotly/kaleido for METplotpy
+
 RUN echo "Install GEOS - needed for cartopy" &&\
     wget http://download.osgeo.org/geos/geos-3.7.2.tar.bz2 && tar xjf geos-3.7.2.tar.bz2 &&\
     (cd geos-3.7.2 && ./configure && make clean && make && make install && ldconfig) &&\
@@ -81,15 +93,10 @@ RUN echo "Install GEOS - needed for cartopy" &&\
   && pip install wheel \
   && pip install python-dateutil \
   && pip install opencv-python \
-  && pip install pandas
-
-#
-# Remove packages containing Critical CVEs:
-#   NAME         INSTALLED               FIXED IN    TYPE VULNERABILITY  SEVERITY EPSS %        RISK
-#   zlib1g-dev   1:1.2.13.dfsg-1         (won't fix) deb  CVE-2023-45853 Critical 0.7% (70th)   0.6    
-#   libxml2      2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49794 Critical < 0.1% (23rd) < 0.1  
-#   libxml2      2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49796 Critical < 0.1% (18th) < 0.1  
-#   libfcgi-bin  2.4.2-2                 (won't fix) deb  CVE-2025-23016 Critical < 0.1% (11th) < 0.1  
-#   libfcgi0ldbl 2.4.2-2                 (won't fix) deb  CVE-2025-23016 Critical < 0.1% (11th) < 0.1 
-#
-RUN apt remove -y zlib1g-dev libxml2 libfcgi-bin libfcgi0ldbl
+  && pip install pandas &&\
+     echo "removing packages containing critcal CVEs" \
+  && apt remove -y zlib1g-dev libxml2 libfcgi-bin libfcgi0ldbl &&\
+     echo "installing missing chrome dependencies that are needed by plotly/kaleido for METplotpy" \
+  && apt install -y \
+      libasound2 libatk-bridge2.0-0 libgbm1 libnss3 libxcomposite1 libxdamage1 libxfixes3 libxkbcommon0 libxrandr2 \
+  && apt clean
