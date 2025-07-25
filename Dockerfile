@@ -98,7 +98,7 @@ RUN apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 \
  && echo "Building ImageMagick without XML support" &&\
     wget https://imagemagick.org/archive/ImageMagick-7.1.2-0.tar.gz &&\
     tar xzf ImageMagick-7.1.2-0.tar.gz &&\
-    cd ImageMagick-7.1.2-0 &&\
+    (cd ImageMagick-7.1.2-0 &&\
     ./configure \
     --without-xml \
     --without-dps \
@@ -121,9 +121,7 @@ RUN apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 \
     --enable-static &&\
     make -j $(nproc) &&\
     make install &&\
-    ldconfig &&\
-    cd .. &&\
-    rm -rf ImageMagick-7.1.2-0* \
+    ldconfig) \
  && echo "Fix rules for ghostscript files in convert" &&\
     echo "See: https://en.linuxportal.info/tutorials/troubleshooting/how-to-fix-errors-from-imagemagick-imagick-conversion-system-security-policy" &&\
     sed -i 's/policy domain="coder" rights="none" pattern="PS/policy domain="coder" rights="read | write" pattern="PS/g' /usr/local/etc/ImageMagick-7/policy.xml &&\
