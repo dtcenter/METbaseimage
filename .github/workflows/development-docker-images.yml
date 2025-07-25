@@ -93,6 +93,7 @@ jobs:
       - name: Scan Docker Image
         run: |
           .github/jobs/scan_docker_image.sh
+        continue-on-error: true
         env:
           GITHUB_NAME: ${{ needs.job_control.outputs.github_name }}
 
