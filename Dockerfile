@@ -18,6 +18,7 @@ ENV F77=/usr/bin/gfortran
 
 ENV GSFONT_URL=https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/ghostscript-fonts-std-8.11.tar.gz
 ENV ZLIB_URL=https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/zlib-1.3.1.tar.gz
+ENV SQLITE3_URL=https://www.sqlite.org/2025/sqlite-autoconf-3500300.tar.gz
 ENV MET_FONT_DIR=/usr/local/share/met/fonts
 
 WORKDIR /met
@@ -34,8 +35,8 @@ RUN \
     apt install -y automake bison build-essential cmake curl flex \
      gfortran git less libbz2-dev libc6-dev libcurl4-gnutls-dev \
      libffi-dev libgdbm-dev libjpeg-dev libncursesw5-dev libopenblas-dev \
-     libpixman-1-dev libreadline-dev libsqlite3-dev libssl-dev libtiff-dev m4 \
-     sqlite3 tk-dev unzip vim wget \
+     libpixman-1-dev libreadline-dev libssl-dev libtiff-dev m4 \
+     tk-dev unzip vim wget \
  && echo "Clean cache after installing system packages" &&\
     apt clean \
  && echo "Dowloading zlib from ${ZLIB_URL}" &&\
@@ -45,6 +46,11 @@ RUN \
     ./configure --enable-shared &&\
     make -j `nproc` &&\
     make install) \
+ && echo "Downloading and installing sqlite3 from ${SQLITE3_URL}" &&\
+    wget ${SQLITE3_URL} &&\
+    filename=$(basename ${SQLITE3_URL}) &&\
+    tar xzf ${filename} &&\
+    (cd ${filename%%.*} && ./configure && make -j $(nproc) && make install) \
  && echo "Downloading GhostScript fonts from ${GSFONT_URL} into /usr/local/share/met" &&\
     mkdir -p /usr/local/share/met &&\
     curl -SL ${GSFONT_URL} | tar zxC /usr/local/share/met \
