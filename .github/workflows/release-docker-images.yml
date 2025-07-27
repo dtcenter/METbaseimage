@@ -9,10 +9,15 @@ on:
   workflow_dispatch:
     inputs:
       release_version:
-        description: 'Comma-separated list of versions to build, e.g. "v3.3","v3.4"'
-        default: '"v3.4"'
+        description: 'Comma-separated list of versions to build, e.g. "v3.3.1"'
+        default: '"v3.3.1"'
         required: true
         type: string
+      update_latest:
+        description: 'For "vX.Y.Z" versions, update the corresponding "X.Y-latest" images.'
+        default: false
+        required: true
+        type: boolean
 
   schedule:
     - cron: "30 00 * * 0"
@@ -29,18 +34,23 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.get-versions.outputs.matrix }}
+      update_latest: ${{ steps.get-versions.outputs.update_latest }}
     steps:
       - name: Get versions to build 
         id: get-versions
         run: |
           if [[ ${{ github.event_name }} == 'schedule' ]]; then
-            version_list="\"v3.3\",\"v3.4\""
+            version_list="\"v3.3.1\""
+            update_latest="true"
           elif [[ ${{ github.event_name }} == 'workflow_dispatch' ]]; then
             version_list=${{ toJSON(inputs.release_version) }}
+            update_latest=${{ toJSON(inputs.update_latest) }}
           else
             version_list=\"${{ toJSON(github.ref_name) }}\"
+            update_latest="true"
           fi
           echo "matrix={\"version\": [ ${version_list} ]}" >> $GITHUB_OUTPUT
+          echo "update_latest=${update_latest}" >> $GITHUB_OUTPUT
 
   build_scan_and_push:
     name: Build, Scan, and Push Images
@@ -86,6 +96,7 @@ jobs:
           .github/jobs/push_docker_image.sh
         env:
           GITHUB_NAME: ${{ matrix.version }}
+          UPDATE_LATEST: ${{ fromJSON(needs.define-matrix.outputs.update_latest) }}
           DOCKER_USERNAME: 'dtcenter'
           DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
 
