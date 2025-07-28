@@ -95,8 +95,5 @@ RUN echo "Install GEOS - needed for cartopy" &&\
   && pip install opencv-python \
   && pip install pandas &&\
      echo "removing packages containing critcal CVEs" \
-  && apt remove -y zlib1g-dev libxml2 libfcgi-bin libfcgi0ldbl &&\
-     echo "installing missing chrome dependencies that are needed by plotly/kaleido for METplotpy" \
-  && apt install -y \
-      libasound2 libatk-bridge2.0-0 libgbm1 libnss3 libxcomposite1 libxdamage1 libxfixes3 libxkbcommon0 libxrandr2 \
+  && apt remove -y zlib1g-dev libxml2 libfcgi-bin libfcgi0ldbl \
   && apt clean
