@@ -9,7 +9,8 @@ source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
 #   $DOCKERHUB_UNIT_TEST_REPO is dtcenter/met-base-unit-test(-dev).
 #   $DOCKERHUB_METVIEWER_REPO is dtcenter/met-base-metviewer(-dev).
 
-MET_BASE_TAG=${GITHUB_NAME}
+# remove leading 'v' from version tag
+MET_BASE_TAG=$(echo ${GITHUB_NAME} | sed 's%/%_%g' | sed 's%^v%%g' )
 
 # Build dtcenter/met-base
 DOCKERHUB_TAG_BASE=$(get_dockerhub_tag ${DOCKERHUB_BASE_REPO} ${GITHUB_NAME})
