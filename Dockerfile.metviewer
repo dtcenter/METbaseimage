@@ -55,7 +55,6 @@ WORKDIR /tmp
 #   libfcgi-bin  2.4.2-2                 (won't fix) deb  CVE-2025-23016 Critical < 0.1% (11th) < 0.1
 #   libfcgi0ldbl 2.4.2-2                 (won't fix) deb  CVE-2025-23016 Critical < 0.1% (11th) < 0.1
 #
-# - Install missing chrome dependencies that are needed by plotly/kaleido for METplotpy
 
 RUN echo "Install GEOS - needed for cartopy" &&\
     wget http://download.osgeo.org/geos/geos-3.7.2.tar.bz2 && tar xjf geos-3.7.2.tar.bz2 &&\
