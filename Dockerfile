@@ -18,6 +18,7 @@ ENV F77=/usr/bin/gfortran
 
 ENV GSFONT_URL=https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/ghostscript-fonts-std-8.11.tar.gz
 ENV ZLIB_URL=https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/zlib-1.3.1.tar.gz
+ENV SQLITE3_URL=https://www.sqlite.org/2025/sqlite-autoconf-3500300.tar.gz
 ENV MET_FONT_DIR=/usr/local/share/met/fonts
 
 WORKDIR /met
@@ -32,10 +33,10 @@ RUN \
  && echo "Installing required system tools" &&\
     apt update && apt -y upgrade &&\
     apt install -y automake bison build-essential cmake curl flex \
-     gfortran git imagemagick less libbz2-dev libc6-dev libcurl4-gnutls-dev \
+     gfortran git less libbz2-dev libc6-dev libcurl4-gnutls-dev \
      libffi-dev libgdbm-dev libjpeg-dev libncursesw5-dev libopenblas-dev \
-     libpixman-1-dev libreadline-dev libsqlite3-dev libssl-dev libtiff-dev m4 \
-     sqlite3 tk-dev unzip vim wget \
+     libpixman-1-dev libreadline-dev libssl-dev libtiff-dev m4 \
+     tk-dev unzip vim wget \
  && echo "Clean cache after installing system packages" &&\
     apt clean \
  && echo "Dowloading zlib from ${ZLIB_URL}" &&\
@@ -45,15 +46,14 @@ RUN \
     ./configure --enable-shared &&\
     make -j `nproc` &&\
     make install) \
+ && echo "Downloading and installing sqlite3 from ${SQLITE3_URL}" &&\
+    wget ${SQLITE3_URL} &&\
+    filename=$(basename ${SQLITE3_URL}) &&\
+    tar xzf ${filename} &&\
+    (cd ${filename%%.*} && ./configure && make -j $(nproc) && make install) \
  && echo "Downloading GhostScript fonts from ${GSFONT_URL} into /usr/local/share/met" &&\
     mkdir -p /usr/local/share/met &&\
     curl -SL ${GSFONT_URL} | tar zxC /usr/local/share/met \
- && echo "Fix rules for ghostscript files in convert" &&\
-    echo "See: https://en.linuxportal.info/tutorials/troubleshooting/how-to-fix-errors-from-imagemagick-imagick-conversion-system-security-policy" &&\
-    sed -i 's/policy domain="coder" rights="none" pattern="PS/policy domain="coder" rights="read | write" pattern="PS/g' /etc/ImageMagick-6/policy.xml &&\
-    sed -i 's/policy domain="coder" rights="none" pattern="EPS"/policy domain="coder" rights="read | write" pattern="EPS"/g' /etc/ImageMagick-6/policy.xml &&\
-    sed -i 's/policy domain="coder" rights="none" pattern="PDF"/policy domain="coder" rights="read | write" pattern="PDF"/g' /etc/ImageMagick-6/policy.xml &&\
-    sed -i 's/policy domain="coder" rights="none" pattern="XPS"/policy domain="coder" rights="read | write" pattern="XPS"/g' /etc/ImageMagick-6/policy.xml \
  && echo "Install Python from source" &&\
     wget https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tgz &&\
     tar xzf Python-${PYTHON_VER}.tgz &&\
@@ -81,7 +81,7 @@ RUN \
     ldconfig
 
 #
-# Remove packages containing Critical CVEs:
+# - Remove packages containing Critical CVEs:
 #   NAME              INSTALLED               FIXED IN    TYPE VULNERABILITY  SEVERITY EPSS % RISK
 #   zlib1g-dev        1:1.2.13.dfsg-1         (won't fix) deb  CVE-2023-45853 Critical 70.89  0.6
 #   libopenexr-3-1-30 3.1.5-5                 (won't fix) deb  CVE-2023-5841  Critical 70.03  0.6
@@ -90,4 +90,47 @@ RUN \
 #   libxml2           2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49796 Critical 18.40  < 0.1
 #   libarchive13      3.6.2-1+deb12u2         (won't fix) deb  CVE-2025-5914  Critical 10.77  < 0.1
 #
-RUN apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13
+# - Install imagemagick after removal because it was removed as a dependency.
+#   Must install from source with some features like xml excluded because version from apt re-installs problematic
+#   packages that contain critical CVEs.
+#
+RUN apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 \
+ && echo "Building ImageMagick without XML support" &&\
+    wget https://imagemagick.org/archive/ImageMagick-7.1.2-0.tar.gz &&\
+    tar xzf ImageMagick-7.1.2-0.tar.gz &&\
+    (cd ImageMagick-7.1.2-0 &&\
+    ./configure \
+    --without-xml \
+    --without-dps \
+    --without-djvu \
+    --without-fftw \
+    --without-fpx \
+    --without-gslib \
+    --without-gvc \
+    --without-jbig \
+    --without-jpeg \
+    --without-lcms \
+    --without-lqr \
+    --without-lzma \
+    --without-openexr \
+    --without-pango \
+    --without-rsvg \
+    --without-webp \
+    --without-x \
+    --disable-shared \
+    --enable-static &&\
+    make -j $(nproc) &&\
+    make install &&\
+    ldconfig) \
+ && echo "Fix rules for ghostscript files in convert" &&\
+    echo "See: https://en.linuxportal.info/tutorials/troubleshooting/how-to-fix-errors-from-imagemagick-imagick-conversion-system-security-policy" &&\
+    sed -i 's/policy domain="coder" rights="none" pattern="PS/policy domain="coder" rights="read | write" pattern="PS/g' /usr/local/etc/ImageMagick-7/policy.xml &&\
+    sed -i 's/policy domain="coder" rights="none" pattern="EPS"/policy domain="coder" rights="read | write" pattern="EPS"/g' /usr/local/etc/ImageMagick-7/policy.xml &&\
+    sed -i 's/policy domain="coder" rights="none" pattern="PDF"/policy domain="coder" rights="read | write" pattern="PDF"/g' /usr/local/etc/ImageMagick-7/policy.xml &&\
+    sed -i 's/policy domain="coder" rights="none" pattern="XPS"/policy domain="coder" rights="read | write" pattern="XPS"/g' /usr/local/etc/ImageMagick-7/policy.xml \
+ && echo "Install Chrome dependencies that are not found in slim OS - needed by plotly/kaleido for METplotpy" &&\
+    apt install -y libasound2 libatk-bridge2.0-0 libcairo2 libcups2 libgbm1 libnss3 libpango-1.0-0 \
+                   libxcomposite1 libxdamage1 libxfixes3 libxkbcommon0 libxrandr2 \
+ && echo "Remove libxml2 and libsqlite3-0 again because they were added again from chrome dependencies" &&\
+    apt remove -y libxml2 libsqlite3-0 &&\
+    apt clean

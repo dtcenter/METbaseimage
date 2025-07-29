@@ -30,7 +30,8 @@ function time_command {
 
 # run command and exit on bad status
 function time_command_exit {
-  retval=$(time_command $@)
+  time_command $@
+  retval=$?
   if [ $retval -ne 0 ]; then
     exit $retval
   fi
@@ -45,7 +46,7 @@ function get_dockerhub_tag {
   echo ${1}:$(echo ${2} | sed 's%/%_%g' | sed 's%^v%%g' )
 }
 
-# utilty function to scan a Docker image for vulnerabilities
+# utility function to scan a Docker image for vulnerabilities
 function cve_scan_image {
   echo "Scanning image $1"
   CMD_LOGFILE="${GITHUB_WORKSPACE}/CVE_Scan_`echo $1 | sed 's%[/,:]%_%g'`.log"
