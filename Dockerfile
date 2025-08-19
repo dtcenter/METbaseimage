@@ -96,7 +96,7 @@ RUN \
 #
 RUN apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 \
  && echo "Building ImageMagick without XML support" &&\
-    wget https://imagemagick.org/archive/ImageMagick-7.1.2-0.tar.gz &&\
+    wget https://github.com/ImageMagick/ImageMagick/archive/refs/tags/7.1.2-0.tar.gz &&\
     tar xzf ImageMagick-7.1.2-0.tar.gz &&\
     (cd ImageMagick-7.1.2-0 &&\
     ./configure \
