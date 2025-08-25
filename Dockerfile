@@ -5,19 +5,20 @@ MAINTAINER George McCabe <mccabe@ucar.edu>
 #
 # Define the compilers
 #
-ENV CC  /usr/bin/gcc
-ENV CXX /usr/bin/g++
-ENV FC  /usr/bin/gfortran
-ENV F77 /usr/bin/gfortran
+ENV CC=/usr/bin/gcc
+ENV CXX=/usr/bin/g++
+ENV FC=/usr/bin/gfortran
+ENV F77=/usr/bin/gfortran
 
 #
 # CVE-2022-37454
 #   Switch from Python 3.10.4 to 3.10.18
 #
-ENV PYTHON_VER 3.10.18
+ENV PYTHON_VER=3.10.18
 
-ENV GSFONT_URL https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/ghostscript-fonts-std-8.11.tar.gz
-ENV ZLIB_URL https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/zlib-1.3.1.tar.gz
+ENV GSFONT_URL=https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/ghostscript-fonts-std-8.11.tar.gz
+ENV ZLIB_URL=https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/zlib-1.3.1.tar.gz
+ENV SQLITE3_URL=https://www.sqlite.org/2025/sqlite-autoconf-3500400.tar.gz
 
 #
 # Set up the environment for interactive bash shell
@@ -28,7 +29,7 @@ RUN echo export MET_BASE=/usr/local/share/met >> /root/.bashrc \
  && echo export RSCRIPTS_BASE=/usr/local/share/met/Rscripts >> /root/.bashrc \
  && echo ulimit -S -s unlimited >> /root/.bashrc
 
-ENV MET_FONT_DIR /usr/local/share/met/fonts
+ENV MET_FONT_DIR=/usr/local/share/met/fonts
 
 #
 # Install required system tools
@@ -39,7 +40,7 @@ RUN apt update && apt -y upgrade \
     vim less \
     libreadline-dev libncursesw5-dev libssl-dev tk-dev \
     libgdbm-dev libc6-dev libbz2-dev libffi-dev \
-    cmake libtiff-dev sqlite3 libsqlite3-dev
+    cmake libtiff-dev
 
 RUN echo "Downloading GhostScript fonts from ${GSFONT_URL} into /usr/local/share/met" \
  && mkdir -p /usr/local/share/met \
@@ -49,13 +50,23 @@ RUN echo "Downloading GhostScript fonts from ${GSFONT_URL} into /usr/local/share
 # CVE-2023-45853
 #   Install zlib 1.3.1 from source to avoid CVEs in the zlib1g-dev 1.2.13 package
 #
-RUN echo "Dowloading zlib from ${ZLIB_URL}" \
+RUN echo "Downloading zlib from ${ZLIB_URL}" \
  && wget ${ZLIB_URL} \
  && tar xzf zlib-1.3.1.tar.gz \
  && cd zlib-1.3.1 \
  && ./configure --enable-shared \
  && make -j `nproc` \
  && make install
+
+#
+# CVE-2025-6965 and CVE-2025-7458
+#   Install sqlite3 from source to avoid critical CVEs
+#
+RUN "Downloading and installing sqlite3 from ${SQLITE3_URL}" \
+ && wget ${SQLITE3_URL} \
+ && filename=$(basename ${SQLITE3_URL}) \
+ && tar xzf ${filename} \
+ && (cd ${filename%%.*} && ./configure && make -j $(nproc) && make install)
 
 #
 # Fix rules for ghostscript files in convert
@@ -124,5 +135,6 @@ RUN ldconfig
 #   libxml2           2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49796 Critical 18.40  < 0.1
 #   libarchive13      3.6.2-1+deb12u2         (won't fix) deb  CVE-2025-5914  Critical 10.77  < 0.1
 #
-RUN apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13
+RUN apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 libsqlite3-0 \
+ && apt clean
 
