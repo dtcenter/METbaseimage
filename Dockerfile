@@ -62,7 +62,7 @@ RUN echo "Downloading zlib from ${ZLIB_URL}" \
 # CVE-2025-6965 and CVE-2025-7458
 #   Install sqlite3 from source to avoid critical CVEs
 #
-RUN "Downloading and installing sqlite3 from ${SQLITE3_URL}" \
+RUN echo "Downloading and installing sqlite3 from ${SQLITE3_URL}" \
  && wget ${SQLITE3_URL} \
  && filename=$(basename ${SQLITE3_URL}) \
  && tar xzf ${filename} \
