@@ -18,7 +18,7 @@ ENV PYTHON_VER=3.10.18
 
 ENV GSFONT_URL=https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/ghostscript-fonts-std-8.11.tar.gz
 ENV ZLIB_URL=https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/zlib-1.3.1.tar.gz
-ENV SQLITE3_URL=https://www.sqlite.org/2025/sqlite-autoconf-3500400.tar.gz
+ENV SQLITE3_URL=https://www.sqlite.org/2025/sqlite-autoconf-3500300.tar.gz
 
 #
 # Set up the environment for interactive bash shell
