@@ -35,7 +35,7 @@ ENV MET_FONT_DIR=/usr/local/share/met/fonts
 # Install required system tools
 #
 RUN apt update && apt -y upgrade \
- && apt install -y build-essential gfortran wget unzip curl imagemagick \
+ && apt install -y build-essential gfortran wget unzip curl \
     libcurl4-gnutls-dev m4 git automake flex bison libjpeg-dev libpixman-1-dev \
     vim less \
     libreadline-dev libncursesw5-dev libssl-dev tk-dev \
