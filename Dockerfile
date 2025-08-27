@@ -69,15 +69,6 @@ RUN echo "Downloading and installing sqlite3 from ${SQLITE3_URL}" \
  && (cd ${filename%%.*} && ./configure && make -j $(nproc) && make install)
 
 #
-# Fix rules for ghostscript files in convert
-# See: https://en.linuxportal.info/tutorials/troubleshooting/how-to-fix-errors-from-imagemagick-imagick-conversion-system-security-policy
-#
-RUN sed -i 's/policy domain="coder" rights="none" pattern="PS/policy domain="coder" rights="read | write" pattern="PS/g' /etc/ImageMagick-6/policy.xml \
- && sed -i 's/policy domain="coder" rights="none" pattern="EPS"/policy domain="coder" rights="read | write" pattern="EPS"/g' /etc/ImageMagick-6/policy.xml \
- && sed -i 's/policy domain="coder" rights="none" pattern="PDF"/policy domain="coder" rights="read | write" pattern="PDF"/g' /etc/ImageMagick-6/policy.xml \
- && sed -i 's/policy domain="coder" rights="none" pattern="XPS"/policy domain="coder" rights="read | write" pattern="XPS"/g' /etc/ImageMagick-6/policy.xml
-
-#
 # Set the working directory
 #
 WORKDIR /met
@@ -126,7 +117,7 @@ RUN BLDOPTS="--global-option=build_ext --global-option=\"-R/usr/local/lib\" --gl
 RUN ldconfig
 
 #
-# Remove packages containing Critical CVEs:
+# - Remove packages containing Critical CVEs:
 #   NAME              INSTALLED               FIXED IN    TYPE VULNERABILITY  SEVERITY EPSS % RISK
 #   zlib1g-dev        1:1.2.13.dfsg-1         (won't fix) deb  CVE-2023-45853 Critical 70.89  0.6
 #   libopenexr-3-1-30 3.1.5-5                 (won't fix) deb  CVE-2023-5841  Critical 70.03  0.6
@@ -135,6 +126,47 @@ RUN ldconfig
 #   libxml2           2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49796 Critical 18.40  < 0.1
 #   libarchive13      3.6.2-1+deb12u2         (won't fix) deb  CVE-2025-5914  Critical 10.77  < 0.1
 #
-RUN apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 libsqlite3-0 \
+# - Install imagemagick after removal because it was removed as a dependency.
+#   Must install from source with some features like xml excluded because version from apt re-installs problematic
+#   packages that contain critical CVEs.
+#
+RUN apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 \
+ && echo "Building ImageMagick without XML support" \
+ && wget https://github.com/ImageMagick/ImageMagick/archive/refs/tags/7.1.2-0.tar.gz \
+ && tar xzf 7.1.2-0.tar.gz \
+ && (cd ImageMagick-7.1.2-0 \
+ && ./configure \
+    --without-xml \
+    --without-dps \
+    --without-djvu \
+    --without-fftw \
+    --without-fpx \
+    --without-gslib \
+    --without-gvc \
+    --without-jbig \
+    --without-jpeg \
+    --without-lcms \
+    --without-lqr \
+    --without-lzma \
+    --without-openexr \
+    --without-pango \
+    --without-rsvg \
+    --without-webp \
+    --without-x \
+    --disable-shared \
+    --enable-static \
+ && make -j $(nproc) \
+ && make install \
+ && ldconfig) \
+ && echo "Fix rules for ghostscript files in convert" \
+ && echo "See: https://en.linuxportal.info/tutorials/troubleshooting/how-to-fix-errors-from-imagemagick-imagick-conversion-system-security-policy" \
+ && sed -i 's/policy domain="coder" rights="none" pattern="PS/policy domain="coder" rights="read | write" pattern="PS/g' /usr/local/etc/ImageMagick-7/policy.xml \
+ && sed -i 's/policy domain="coder" rights="none" pattern="EPS"/policy domain="coder" rights="read | write" pattern="EPS"/g' /usr/local/etc/ImageMagick-7/policy.xml \
+ && sed -i 's/policy domain="coder" rights="none" pattern="PDF"/policy domain="coder" rights="read | write" pattern="PDF"/g' /usr/local/etc/ImageMagick-7/policy.xml \
+ && sed -i 's/policy domain="coder" rights="none" pattern="XPS"/policy domain="coder" rights="read | write" pattern="XPS"/g' /usr/local/etc/ImageMagick-7/policy.xml \
+ && echo "Install Chrome dependencies that are not found in slim OS - needed by plotly/kaleido for METplotpy" \
+ && apt install -y libasound2 libatk-bridge2.0-0 libcairo2 libcups2 libgbm1 libnss3 libpango-1.0-0 \
+                   libxcomposite1 libxdamage1 libxfixes3 libxkbcommon0 libxrandr2 \
+ && echo "Remove libxml2 and libsqlite3-0 again because they were added again from chrome dependencies" \
+ && apt remove -y libxml2 libsqlite3-0 \
  && apt clean
-
