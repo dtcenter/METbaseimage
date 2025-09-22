@@ -1,4 +1,4 @@
-ARG DEBIAN_VERSION=13
+ARG DEBIAN_VERSION=12
 FROM debian:${DEBIAN_VERSION}-slim
 LABEL maintainer="George McCabe <mccabe@ucar.edu>"
 
@@ -32,7 +32,7 @@ RUN \
     echo ulimit -S -s unlimited >> /root/.bashrc \
  && echo "Installing required system tools" &&\
     apt update && apt -y upgrade &&\
-    apt install -y automake bison build-essential cmake curl flex \
+    apt install -y automake bison build-essential cmake curl equivs flex \
      gfortran git less libbz2-dev libc6-dev libcurl4-gnutls-dev \
      libffi-dev libgdbm-dev libjpeg-dev libncursesw5-dev libopenblas-dev \
      libpixman-1-dev libreadline-dev libssl-dev libtiff-dev m4 \
@@ -128,9 +128,19 @@ RUN apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 \
     sed -i 's/policy domain="coder" rights="none" pattern="EPS"/policy domain="coder" rights="read | write" pattern="EPS"/g' /usr/local/etc/ImageMagick-7/policy.xml &&\
     sed -i 's/policy domain="coder" rights="none" pattern="PDF"/policy domain="coder" rights="read | write" pattern="PDF"/g' /usr/local/etc/ImageMagick-7/policy.xml &&\
     sed -i 's/policy domain="coder" rights="none" pattern="XPS"/policy domain="coder" rights="read | write" pattern="XPS"/g' /usr/local/etc/ImageMagick-7/policy.xml \
+ && echo "Create dummy packages to prevent reinstallation of packages with CVEs" &&\
+    ( \
+        echo 'Package: libsqlite3-0'; \
+        echo 'Version: 9:9.9.9'; \
+        echo 'Architecture: amd64'; \
+        echo 'Maintainer: Dummy Pkg'; \
+        echo 'Description: Dummy package to satisfy libnss3 dependency with source-built sqlite3'; \
+    ) > /tmp/libsqlite3-0.control && \
+    equivs-build /tmp/libsqlite3-0.control &&\
+    dpkg -i libsqlite3-0_9.9.9_amd64.deb \
  && echo "Install Chrome dependencies that are not found in slim OS - needed by plotly/kaleido for METplotpy" &&\
     apt install -y libasound2 libatk-bridge2.0-0 libcairo2 libcups2 libgbm1 libnss3 libpango-1.0-0 \
                    libxcomposite1 libxdamage1 libxfixes3 libxkbcommon0 libxrandr2 \
- && echo "Remove libxml2 and libsqlite3-0 again because they were added again from chrome dependencies" &&\
-    apt remove -y libxml2 libsqlite3-0 &&\
+ && echo "Remove libxml2 again because it was added again from chrome dependencies" &&\
+    apt remove -y libxml2 &&\
     apt clean
