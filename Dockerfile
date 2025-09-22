@@ -1,4 +1,4 @@
-ARG DEBIAN_VERSION=12
+ARG DEBIAN_VERSION=13
 FROM debian:${DEBIAN_VERSION}-slim
 LABEL maintainer="George McCabe <mccabe@ucar.edu>"
 
