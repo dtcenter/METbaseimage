@@ -67,6 +67,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Free disk space
+        run: .github/jobs/free_disk_space.sh
+
       - uses: actions/checkout@v4
         with:
           ref: ${{ needs.job_control.outputs.github_name }}
