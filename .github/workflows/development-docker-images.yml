@@ -67,8 +67,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Free disk space
-        run: .github/jobs/free_disk_space.sh
+      - name: Free Disk Space
+        uses: dtcenter/metplus-action-free-disk-space@v1
 
       - uses: actions/checkout@v4
         with:
@@ -85,20 +85,15 @@ jobs:
         env:
           GITHUB_NAME: ${{ needs.job_control.outputs.github_name }}
 
-      - name: Install Syft
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
-
-      - name: Install Grype
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
-
-      - name: Scan Docker Image
-        run: |
-          .github/jobs/scan_docker_image.sh
-        continue-on-error: true
-        env:
-          GITHUB_NAME: ${{ needs.job_control.outputs.github_name }}
+      - name: Scan Docker Images
+        uses: dtcenter/metplus-action-scan-docker-images@v1
+        with:
+          images: |
+            [
+              "${{ env.DOCKERHUB_BASE_REPO }}:${{ needs.job_control.outputs.github_name }}",
+              "${{ env.DOCKERHUB_UNIT_TEST_REPO }}:${{ needs.job_control.outputs.github_name }}",
+              "${{ env.DOCKERHUB_METVIEWER_REPO }}:${{ needs.job_control.outputs.github_name }}"
+            ]
 
       - name: Push Docker Image
         if: ${{ needs.job_control.outputs.push_image == 'true' }}
