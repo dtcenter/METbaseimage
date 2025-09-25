@@ -50,7 +50,9 @@ function get_dockerhub_tag {
 function cve_scan_image {
   echo "Scanning image $1"
   CMD_LOGFILE="${GITHUB_WORKSPACE}/CVE_Scan_`echo $1 | sed 's%[/,:]%_%g'`.log"
-  time_command grype $1
+  if ! time_command grype $1; then
+    exit 1
+  fi
   CMD_LOGFILE="${GITHUB_WORKSPACE}/CVE_Scan_`echo $1 | sed 's%[/,:]%_%g'`.log"
 
   # print CVE counts
