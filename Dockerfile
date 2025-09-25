@@ -2,8 +2,8 @@ ARG DEBIAN_VERSION=12
 FROM debian:${DEBIAN_VERSION}-slim
 LABEL maintainer="George McCabe <mccabe@ucar.edu>"
 
-ARG MET_COMPILE_SCRIPT_BRANCH=develop
-ARG MET_TAR_FILE_VERSION_NAME=met-base-develop
+ARG MET_COMPILE_SCRIPT_BRANCH=main_v12.1
+ARG MET_TAR_FILE_VERSION_NAME=met-base-v3.4
 
 #
 # CVE-2025-4517
@@ -33,7 +33,7 @@ RUN \
  && echo "Installing required system tools" &&\
     apt update && apt -y upgrade &&\
     apt install -y automake bison build-essential cmake curl equivs flex \
-     gfortran git less libbz2-dev libc6-dev libcurl4-gnutls-dev \
+     gfortran ghostscript git less libbz2-dev libc6-dev libcurl4-gnutls-dev \
      libffi-dev libgdbm-dev libjpeg-dev libncursesw5-dev libopenblas-dev \
      libpixman-1-dev libreadline-dev libssl-dev libtiff-dev m4 \
      tk-dev unzip vim wget \
