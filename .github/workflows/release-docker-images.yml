@@ -91,6 +91,7 @@ jobs:
               "${{ env.DOCKERHUB_METVIEWER_REPO }}:${{ matrix.version }}"
             ]
           fail-on-critical: "true"
+          log-artifact-name: "security-scan-logs"
 
       - name: Push Docker Image
         run: |
