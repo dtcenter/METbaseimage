@@ -8,6 +8,20 @@ Please see the [MET website](https://dtcenter.org/community-code/model-evaluatio
 Version History
 ===============
 
+v3.4.3
+------
+
+* Address the rest of Critical CVEs in METbaseimage ([Internal #62](https://github.com/dtcenter/METplus-Internal/issues/62))
+   * Create dummy package for libsqlite3-0 to prevent apt from installing it again
+
+v3.4.2
+------
+
+* Address most Critical CVEs in METbaseimage ([Internal #62](https://github.com/dtcenter/METplus-Internal/issues/62))
+   * Install sqlite version 3.50.3
+   * Install ImageMagick version 7.1.2 without XML support
+   * Remove packages containing critical CVEs
+
 v3.4.1
 ------
 
@@ -20,6 +34,16 @@ v3.4
 ----
 
 * Python 3.12.0 (#30)
+
+
+v3.3.2
+------
+
+* Address Critical CVEs in METbaseimage ([Internal #62](https://github.com/dtcenter/METplus-Internal/issues/62))
+   * Install sqlite version 3.50.3
+   * Install ImageMagick version 7.1.2 without XML support
+   * Remove packages containing critical CVEs
+   * Create dummy package for libsqlite3-0 to prevent apt from installing it again
 
 v3.3.1
 ------
