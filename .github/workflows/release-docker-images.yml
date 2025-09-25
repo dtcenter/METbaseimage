@@ -91,7 +91,6 @@ jobs:
               "${{ env.DOCKERHUB_METVIEWER_REPO }}:${{ matrix.version }}"
             ]
           fail-on-critical: "true"
-          log-artifact-name: "security-scan-logs"
 
       - name: Push Docker Image
         run: |
@@ -114,4 +113,3 @@ jobs:
           name: logs_${{ matrix.version }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
-

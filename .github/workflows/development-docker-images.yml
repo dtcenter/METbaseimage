@@ -86,6 +86,8 @@ jobs:
           GITHUB_NAME: ${{ needs.job_control.outputs.github_name }}
 
       - name: Scan Docker Images
+        id: scan
+        continue-on-error: true
         uses: dtcenter/metplus-action-scan-docker-images@v1
         with:
           images: |
@@ -117,3 +119,7 @@ jobs:
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
+      - name: Check scan status
+        run: |
+          echo "Scan status: ${{ steps.scan.outputs.scan-status }}"
+          exit ${{ steps.scan.outputs.scan-status }}
