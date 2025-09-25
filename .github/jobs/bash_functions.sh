@@ -7,7 +7,7 @@ function time_command {
   local start_seconds=$SECONDS
   echo "::group::RUNNING: $*"
 
-  local retval 
+  local retval
   # pipe output to log file if set
   if [ "x$CMD_LOGFILE" == "x" ]; then
     "$@"
