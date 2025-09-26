@@ -45,33 +45,3 @@ function time_command_exit {
 function get_dockerhub_tag {
   echo ${1}:$(echo ${2} | sed 's%/%_%g' | sed 's%^v%%g' )
 }
-
-# utility function to scan a Docker image for vulnerabilities
-function cve_scan_image {
-  echo "Scanning image $1"
-  CMD_LOGFILE="${GITHUB_WORKSPACE}/CVE_Scan_`echo $1 | sed 's%[/,:]%_%g'`.log"
-  time_command grype $1
-  CMD_LOGFILE="${GITHUB_WORKSPACE}/CVE_Scan_`echo $1 | sed 's%[/,:]%_%g'`.log"
-
-  # print CVE counts
-  cve_summary="Found $(grep -E " Critical | High | Medium | Low | Negligible " $CMD_LOGFILE | wc -l) CVEs for image $1: "
-  for status in Critical High Medium Low Negligible; do
-    if [[ $status != "Critical" ]]; then
-      cve_summary+=", " 
-    fi
-    cve_summary+="$(grep $status $CMD_LOGFILE | wc -l) ${status}"
-  done
-  echo $cve_summary
-
-  # print critical CVEs
-  N_CRITICAL=`grep " Critical " ${CMD_LOGFILE} | wc -l`
-  if [ ${N_CRITICAL} -gt 0 ]; then
-    echo "WARNING: Found ${N_CRITICAL} Critical CVEs for image $1 in ${CMD_LOGFILE}"
-    echo
-    egrep "SEVERITY|Critical" ${CMD_LOGFILE}
-    echo
-    return 1
-  fi
-
-  return 0
-}

@@ -32,7 +32,7 @@ RUN \
     echo ulimit -S -s unlimited >> /root/.bashrc \
  && echo "Installing required system tools" &&\
     apt update && apt -y upgrade &&\
-    apt install -y automake bison build-essential cmake curl flex \
+    apt install -y automake bison build-essential cmake curl equivs flex \
      gfortran ghostscript git less libbz2-dev libc6-dev libcurl4-gnutls-dev \
      libffi-dev libgdbm-dev libjpeg-dev libncursesw5-dev libopenblas-dev \
      libpixman-1-dev libreadline-dev libssl-dev libtiff-dev m4 \
@@ -50,7 +50,18 @@ RUN \
     wget ${SQLITE3_URL} &&\
     filename=$(basename ${SQLITE3_URL}) &&\
     tar xzf ${filename} &&\
-    (cd ${filename%%.*} && ./configure && make -j $(nproc) && make install) \
+    (cd ${filename%%.*} && ./configure && make -j $(nproc) && make install) &&\
+    echo "/usr/local/lib" > /etc/ld.so.conf.d/usr-local.conf && ldconfig \
+ && echo "Create dummy packages to prevent reinstallation of packages with CVEs" &&\
+    ( \
+        echo 'Package: libsqlite3-0'; \
+        echo 'Version: 9:9.9.9'; \
+        echo 'Architecture: amd64'; \
+        echo 'Maintainer: Dummy Pkg'; \
+        echo 'Description: Dummy package to satisfy libnss3 dependency with source-built sqlite3'; \
+    ) > /tmp/libsqlite3-0.control && \
+    equivs-build /tmp/libsqlite3-0.control &&\
+    dpkg -i libsqlite3-0_9.9.9_amd64.deb \
  && echo "Downloading GhostScript fonts from ${GSFONT_URL} into /usr/local/share/met" &&\
     mkdir -p /usr/local/share/met &&\
     curl -SL ${GSFONT_URL} | tar zxC /usr/local/share/met \
@@ -105,17 +116,13 @@ RUN apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 \
     --without-djvu \
     --without-fftw \
     --without-fpx \
-    --without-gslib \
     --without-gvc \
     --without-jbig \
-    --without-jpeg \
-    --without-lcms \
     --without-lqr \
     --without-lzma \
     --without-openexr \
     --without-pango \
     --without-rsvg \
-    --without-webp \
     --without-x \
     --disable-shared \
     --enable-static &&\
@@ -131,6 +138,6 @@ RUN apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 \
  && echo "Install Chrome dependencies that are not found in slim OS - needed by plotly/kaleido for METplotpy" &&\
     apt install -y libasound2 libatk-bridge2.0-0 libcairo2 libcups2 libgbm1 libnss3 libpango-1.0-0 \
                    libxcomposite1 libxdamage1 libxfixes3 libxkbcommon0 libxrandr2 \
- && echo "Remove libxml2 and libsqlite3-0 again because they were added again from chrome dependencies" &&\
-    apt remove -y libxml2 libsqlite3-0 &&\
+ && echo "Remove libxml2 again because it was added again from chrome dependencies" &&\
+    apt remove -y libxml2 &&\
     apt clean
