@@ -71,13 +71,11 @@ jobs:
           ref: ${{ matrix.version }}
           path: ${{ matrix.version }}
 
-      - name: Create directories to store output
-        run: |
-          mkdir -p ${RUNNER_WORKSPACE}/logs
+      - name: Create directories to store build log output
+        run: mkdir -p ${RUNNER_WORKSPACE}/logs
 
       - name: Build Docker Image
-        run: |
-          .github/jobs/build_docker_image.sh
+        run: .github/jobs/build_docker_image.sh
         env:
           GITHUB_NAME: ${{ matrix.version }}
 
@@ -91,25 +89,24 @@ jobs:
               "${{ env.DOCKERHUB_METVIEWER_REPO }}:${{ matrix.version }}"
             ]
           fail-on-critical: "true"
+          log-artifact-name: "security-scan-logs_${{ matrix.version }}"
 
       - name: Push Docker Image
-        run: |
-          .github/jobs/push_docker_image.sh
+        run: .github/jobs/push_docker_image.sh
         env:
           GITHUB_NAME: ${{ matrix.version }}
           UPDATE_LATEST: ${{ fromJSON(needs.define-matrix.outputs.update_latest) }}
           DOCKER_USERNAME: 'dtcenter'
           DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
 
-      - name: Copy log files into logs directory
+      - name: Copy build log files into logs directory
         if: always()
-        run: |
-          cp ${GITHUB_WORKSPACE}/*.log ${RUNNER_WORKSPACE}/logs/
+        run: cp ${GITHUB_WORKSPACE}/*.log ${RUNNER_WORKSPACE}/logs/
 
-      - name: Upload logs as artifact
+      - name: Upload build logs as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs_${{ matrix.version }}
+          name: build_logs_${{ matrix.version }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore

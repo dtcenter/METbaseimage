@@ -75,13 +75,11 @@ jobs:
           ref: ${{ needs.job_control.outputs.github_name }}
           path: ${{ needs.job_control.outputs.github_name }}
 
-      - name: Create directories to store output
-        run: |
-          mkdir -p ${RUNNER_WORKSPACE}/logs
+      - name: Create directories to store build log output
+        run: mkdir -p ${RUNNER_WORKSPACE}/logs
 
       - name: Build Docker Image
-        run: |
-          .github/jobs/build_docker_image.sh
+        run: .github/jobs/build_docker_image.sh
         env:
           GITHUB_NAME: ${{ needs.job_control.outputs.github_name }}
 
@@ -96,26 +94,25 @@ jobs:
               "${{ env.DOCKERHUB_UNIT_TEST_REPO }}:${{ needs.job_control.outputs.github_name }}",
               "${{ env.DOCKERHUB_METVIEWER_REPO }}:${{ needs.job_control.outputs.github_name }}"
             ]
+          fail-on-critical: "true"
 
       - name: Push Docker Image
         if: ${{ needs.job_control.outputs.push_image == 'true' }}
-        run: |
-          .github/jobs/push_docker_image.sh
+        run: .github/jobs/push_docker_image.sh
         env:
           GITHUB_NAME: ${{ needs.job_control.outputs.github_name }}
           DOCKER_USERNAME: 'dtcenter'
           DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
 
-      - name: Copy log files into logs directory
+      - name: Copy build log files into logs directory
         if: always()
-        run: |
-          cp ${GITHUB_WORKSPACE}/*.log ${RUNNER_WORKSPACE}/logs/
+        run: cp ${GITHUB_WORKSPACE}/*.log ${RUNNER_WORKSPACE}/logs/
 
-      - name: Upload logs as artifact
+      - name: Upload build logs as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: build_logs
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
