@@ -71,6 +71,19 @@ jobs:
           ref: ${{ matrix.version }}
           path: ${{ matrix.version }}
 
+      - name: Get DockerHub tags
+        id: get-dockerhub-tags
+        run: |
+          source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
+          base_repo_tag=$(get_dockerhub_tag ${{ env.DOCKERHUB_BASE_REPO }} ${{ matrix.version }})
+          unit_test_repo_tag=$(get_dockerhub_tag ${{ env.DOCKERHUB_UNIT_TEST_REPO }} ${{ matrix.version }})
+          metviewer_repo_tag=$(get_dockerhub_tag ${{ env.DOCKERHUB_METVIEWER_REPO }} ${{ matrix.version }})
+          echo "base_repo_tag=${base_repo_tag}" >> $GITHUB_OUTPUT
+          echo "unit_test_repo_tag=${unit_test_repo_tag}" >> $GITHUB_OUTPUT
+          echo "metviewer_repo_tag=${metviewer_repo_tag}" >> $GITHUB_OUTPUT
+        env:
+          SOURCE_BRANCH: ${{ matrix.version }}
+
       - name: Create directories to store build log output
         run: mkdir -p ${RUNNER_WORKSPACE}/logs
 
@@ -84,9 +97,9 @@ jobs:
         with:
           images: |
             [
-              "${{ env.DOCKERHUB_BASE_REPO }}:${{ matrix.version }}",
-              "${{ env.DOCKERHUB_UNIT_TEST_REPO }}:${{ matrix.version }}",
-              "${{ env.DOCKERHUB_METVIEWER_REPO }}:${{ matrix.version }}"
+              "${{ steps.get-dockerhub-tags.outputs.base_repo_tag }}",
+              "${{ steps.get-dockerhub-tags.outputs.unit_test_repo_tag }}",
+              "${{ steps.get-dockerhub-tags.outputs.metviewer_repo_tag }}"
             ]
           fail-on-critical: "true"
           log-artifact-name: "security-scan-logs_${{ matrix.version }}"
