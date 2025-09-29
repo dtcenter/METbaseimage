@@ -30,7 +30,8 @@ function time_command {
 
 # run command and exit on bad status
 function time_command_exit {
-  retval=$(time_command $@)
+  time_command $@
+  retval=$?
   if [ $retval -ne 0 ]; then
     exit $retval
   fi

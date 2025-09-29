@@ -92,7 +92,6 @@ jobs:
         env:
           GITHUB_NAME: ${{ matrix.version }}
 
-
       - name: Scan Docker Images
         uses: dtcenter/metplus-action-scan-docker-images@v1
         with:
