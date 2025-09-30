@@ -8,6 +8,13 @@ Please see the [MET website](https://dtcenter.org/community-code/model-evaluatio
 Version History
 ===============
 
+v3.4.4
+------
+
+* Address Critical CVEs that do not appear in internal grype scan - update tomcat to 9.0.109
+  * CVE-2025-31651 (tomcat-util)
+  * CVE-2025-24813 (tomcat-util)
+
 v3.4.3
 ------
 
@@ -35,6 +42,12 @@ v3.4
 
 * Python 3.12.0 (#30)
 
+v3.3.3
+------
+
+* Address Critical CVEs that do not appear in internal grype scan - update tomcat to 9.0.109
+  * CVE-2025-31651 (tomcat-util)
+  * CVE-2025-24813 (tomcat-util)
 
 v3.3.2
 ------
