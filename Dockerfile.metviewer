@@ -109,7 +109,7 @@ RUN pip install cartopy \
  && pip install packaging==22.0 \
  && pip install pluggy==1.0.0 \
  && pip install pytz==2022.6 \
- && pip install setuptools==65.5.1 \
+ && pip install setuptools==78.1.1 \
  && pip install six==1.16.0 \
  && pip install tomli==2.0.1 \
  && pip install wheel==0.38.1 \
