@@ -42,6 +42,13 @@ v3.4
 
 * Python 3.12.0 (#30)
 
+v3.3.4
+------
+
+* Address 2 High CVEs - update setuptools (python) to 78.1.1
+  * CVE-2024-6345 (GHSA-cx63-2mw6-8hw5)
+  * CVE-2025-47273 (GHSA-5rjg-fvgr-3xxf)
+
 v3.3.3
 ------
 
