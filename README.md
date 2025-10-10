@@ -8,6 +8,11 @@ Please see the [MET website](https://dtcenter.org/community-code/model-evaluatio
 Version History
 ===============
 
+v3.4.5
+------
+
+* Remove private keys found in Python test libs
+
 v3.4.4
 ------
 
@@ -41,6 +46,12 @@ v3.4
 ----
 
 * Python 3.12.0 (#30)
+
+v3.3.5
+------
+
+* Remove private keys found in Python test libs
+
 
 v3.3.4
 ------
