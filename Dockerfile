@@ -89,11 +89,12 @@ WORKDIR /met
 #
 RUN wget https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tgz \
  && tar xzf Python-${PYTHON_VER}.tgz \
- && cd Python-${PYTHON_VER} \
- && ./configure --enable-optimizations --enable-shared LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" \
+ && (cd Python-${PYTHON_VER} \
+ && ./configure --enable-optimizations --enable-shared --disable-test-modules LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" \
  && make -j `nproc` \
- && make install \
- && ln -s /usr/local/bin/python3 /usr/local/bin/python
+ && make install) \
+ && ln -s /usr/local/bin/python3 /usr/local/bin/python \
+ && rm -rf Python-${PYTHON_VER}*
 
 #
 # Compile the MET libraries
