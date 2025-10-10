@@ -69,10 +69,11 @@ RUN \
     wget https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tgz &&\
     tar xzf Python-${PYTHON_VER}.tgz &&\
     (cd Python-${PYTHON_VER} &&\
-    ./configure --enable-optimizations --enable-shared LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" &&\
+    ./configure --enable-optimizations --enable-shared --disable-test-modules LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" &&\
     make -j `nproc` &&\
     make install) &&\
-    ln -s /usr/local/bin/python3 /usr/local/bin/python \
+    ln -s /usr/local/bin/python3 /usr/local/bin/python &&\
+    rm -rf Python-${PYTHON_VER}* \
  && echo "Compile the MET libraries" &&\
     echo "Pulling compilation script from MET branch ${MET_COMPILE_SCRIPT_BRANCH}" &&\
     wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.${MET_TAR_FILE_VERSION_NAME}.tgz &&\
