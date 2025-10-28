@@ -84,12 +84,11 @@ RUN \
     chmod +x compile_MET_all.sh &&\
     ./compile_MET_all.sh development.docker \
  && echo "Installing required Python packages" &&\
-    (export HDF5_DIR=/usr/local/ &&\
-     export NETCDF4_DIR=/usr/local/ &&\
-     export CPPFLAGS="-I/usr/local/include" &&\
-     export LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" &&\
-     python3 -m pip install --upgrade pip &&\
-     python3 -m pip install --no-binary :all netCDF4==1.7.2 numpy==2.2.2 pyyaml==6.0.2 scipy==1.15.1 xarray==2025.1.2) \
+    BLDOPTS="--global-option=build_ext --global-option=\"-R/usr/local/lib\" --global-option=\"-L/usr/local/lib\"" &&\
+    export HDF5_DIR=/usr/local/ &&\
+    export NETCDF4_DIR=/usr/local/ &&\
+    python3 -m pip install --upgrade pip &&\
+    python3 -m pip install ${BLDOPTS} numpy==2.2.2 xarray==2025.1.2 netCDF4==1.7.2 pyyaml==6.0.2 scipy==1.15.1 \
  && echo "Running linker configuration" &&\
     ldconfig
 
