@@ -113,15 +113,14 @@ RUN echo "Pulling compilation script from MET branch ${MET_COMPILE_SCRIPT_BRANCH
 #
 # Install required Python packages
 #
-RUN export CPPFLAGS="-I/usr/local/include" \
- && export LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" \
+RUN BLDOPTS="--global-option=build_ext --global-option=\"-R/usr/local/lib\" --global-option=\"-L/usr/local/lib\"" \
  && python3 -m pip install --upgrade pip \
- && python3 -m pip install --no-binary :all numpy==1.26.4 \
- && python3 -m pip install --no-binary :all xarray==2023.1.0 \
+ && python3 -m pip install ${BLDOPTS} numpy==1.26.4 \
+ && python3 -m pip install ${BLDOPTS} xarray==2023.1.0 \
  && export HDF5_DIR=/usr/local/ \
  && export NETCDF4_DIR=/usr/local/ \
  && python3 -m pip install netCDF4==1.6.2 \
- && python3 -m pip install --no-binary :all pyyaml==6.0.1 \
+ && python3 -m pip install ${BLDOPTS} pyyaml==6.0.1 \
  && python3 -m pip install scipy==1.11.1 \
  && python3 -m pip install setuptools==78.1.1
 
