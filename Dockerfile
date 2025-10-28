@@ -84,7 +84,7 @@ RUN \
     chmod +x compile_MET_all.sh &&\
     ./compile_MET_all.sh development.docker \
  && echo "Installing required Python packages" &&\
-    BLDOPTS="--global-option=build_ext --global-option=\"-R/usr/local/lib\" --global-option=\"-L/usr/local/lib\"" &&\
+    BLDOPTS="--config-settings=--build-option=build_ext --config-settings=--build-option=\"-R/usr/local/lib\" --config-settings=--build-option=\"-L/usr/local/lib\"" &&\
     export HDF5_DIR=/usr/local/ &&\
     export NETCDF4_DIR=/usr/local/ &&\
     python3 -m pip install --upgrade pip &&\
