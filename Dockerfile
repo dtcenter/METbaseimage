@@ -88,7 +88,7 @@ RUN \
     export HDF5_DIR=/usr/local/ &&\
     export NETCDF4_DIR=/usr/local/ &&\
     python3 -m pip install --upgrade pip &&\
-    python3 -m pip install ${BLDOPTS} numpy==2.2.2 xarray==2025.1.2 netCDF4==1.7.2 pyyaml==6.0.2 scipy==1.15.1 \
+    python3 -m pip install --no-binary :all: ${BLDOPTS} numpy==2.2.2 xarray==2025.1.2 netCDF4==1.7.2 pyyaml==6.0.2 scipy==1.15.1 \
  && echo "Running linker configuration" &&\
     ldconfig
 
