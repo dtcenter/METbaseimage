@@ -89,7 +89,7 @@ RUN \
      export CPPFLAGS="-I/usr/local/include" &&\
      export LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" &&\
      python3 -m pip install --upgrade pip &&\
-     python3 -m pip install --no-binary :all netCDF4==1.7.2 numpy==2.2.2 pyyaml==6.0.2 scipy==1.15.1 xarray==2025.1.2) \
+     python3 -m pip install --no-binary :all: netCDF4==1.7.2 numpy==2.2.2 pyyaml==6.0.2 scipy==1.15.1 xarray==2025.1.2) \
  && echo "Running linker configuration" &&\
     ldconfig
 
