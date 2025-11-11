@@ -21,6 +21,8 @@ ENV ZLIB_URL=https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/zlib-
 ENV SQLITE3_URL=https://www.sqlite.org/2025/sqlite-autoconf-3500300.tar.gz
 ENV MET_FONT_DIR=/usr/local/share/met/fonts
 
+ENV GOSU_VERSION 1.19
+
 WORKDIR /met
 
 # copy entrypoint script to set up non-root user to use calling users credentials
@@ -62,7 +64,7 @@ RUN \
  && echo "Installing required system tools" &&\
     apt update && apt -y upgrade &&\
     apt install -y automake bison build-essential cmake curl equivs flex \
-     gfortran ghostscript git gosu less libbz2-dev libc6-dev libcurl4-gnutls-dev \
+     gfortran ghostscript git less libbz2-dev libc6-dev libcurl4-gnutls-dev \
      libffi-dev libgdbm-dev libjpeg-dev libncursesw5-dev libopenblas-dev \
      libpixman-1-dev libreadline-dev libssl-dev libtiff-dev m4 \
      tk-dev unzip vim wget \
@@ -159,6 +161,15 @@ RUN \
                    libxcomposite1 libxdamage1 libxfixes3 libxkbcommon0 libxrandr2 \
  && echo "Remove libxml2 again because it was added again from chrome dependencies" &&\
     apt remove -y libxml2 \
+ && echo "Install gosu to be able to switch to non-root user in downstream containers" &&\
+    dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; &&\
+    gpg --keyserver hkps://keys.openpgp.org --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 &&\
+    curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch" &&\
+    curl -o /usr/local/bin/gosu.asc -SL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc" &&\
+    gpg --verify /usr/local/bin/gosu.asc &&\
+    rm /usr/local/bin/gosu.asc &&\
+    rm -r /root/.gnupg/ &&\
+    chmod +x /usr/local/bin/gosu \
  && echo "Clean apt and remove package list cache files" &&\
     apt clean &&\
     rm -rf /var/lib/apt/lists/*
