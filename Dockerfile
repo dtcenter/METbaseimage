@@ -23,17 +23,46 @@ ENV MET_FONT_DIR=/usr/local/share/met/fonts
 
 WORKDIR /met
 
+# copy entrypoint script to set up non-root user to use calling users credentials
+# this is not called by base image but is called by downstream images
+
+COPY user-entrypoint.sh /usr/local/bin/
+
+# - Open permissions for entrypoint script to handle non-root user
+# - Set up environment for bash shell
+# - Set soft limit to unlimited to prevent GRIB2 seg faults
+# - Create non-root metplus_user
+# - Install zlib, sqlite3, python from source
+# - Compile MET libraries
+# - Install Python package requirements
+# - Remove packages containing Critical CVEs:
+#   NAME              INSTALLED               FIXED IN    TYPE VULNERABILITY  SEVERITY EPSS % RISK
+#   zlib1g-dev        1:1.2.13.dfsg-1         (won't fix) deb  CVE-2023-45853 Critical 70.89  0.6
+#   libopenexr-3-1-30 3.1.5-5                 (won't fix) deb  CVE-2023-5841  Critical 70.03  0.6
+#   libaom3           3.6.0-1+deb12u1         (won't fix) deb  CVE-2023-6879  Critical 37.08  0.1
+#   libxml2           2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49794 Critical 23.45  < 0.1
+#   libxml2           2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49796 Critical 18.40  < 0.1
+#   libarchive13      3.6.2-1+deb12u2         (won't fix) deb  CVE-2025-5914  Critical 10.77  < 0.1
+#
+# - Install imagemagick after removal because it was removed as a dependency.
+#   Must install from source with some features like xml excluded because version from apt re-installs problematic
+#   packages that contain critical CVEs.
+
 RUN \
-    echo "Set up the environment for interactive bash shell" &&\
-    echo export MET_BASE=/usr/local/share/met >> /root/.bashrc &&\
-    echo export MET_FONT_DIR=/usr/local/share/met/fonts >> /root/.bashrc &&\
-    echo export RSCRIPTS_BASE=/usr/local/share/met/Rscripts >> /root/.bashrc \
+    echo "Open permissions for entrypoint script to set up non-root user" &&\
+    chmod +x /usr/local/bin/user-entrypoint.sh \
+ && echo "Set up the environment for interactive bash shell" &&\
+    echo export MET_BASE=/usr/local/share/met >> /etc/profile.d/metplus_env.sh &&\
+    echo export MET_FONT_DIR=/usr/local/share/met/fonts >> /etc/profile.d/metplus_env.sh &&\
+    echo export RSCRIPTS_BASE=/usr/local/share/met/Rscripts >> /etc/profile.d/metplus_env.sh \
  && echo "Set soft limit to unlimited to prevent GRIB2 seg faults" &&\
-    echo ulimit -S -s unlimited >> /root/.bashrc \
+    echo ulimit -S -s unlimited >> /etc/profile.d/metplus_env.sh \
+ && echo "Create non-root metplus_user user to run containers" &&\
+    useradd --shell /bin/bash --create-home --user-group metplus_user \
  && echo "Installing required system tools" &&\
     apt update && apt -y upgrade &&\
     apt install -y automake bison build-essential cmake curl equivs flex \
-     gfortran ghostscript git less libbz2-dev libc6-dev libcurl4-gnutls-dev \
+     gfortran ghostscript git gosu less libbz2-dev libc6-dev libcurl4-gnutls-dev \
      libffi-dev libgdbm-dev libjpeg-dev libncursesw5-dev libopenblas-dev \
      libpixman-1-dev libreadline-dev libssl-dev libtiff-dev m4 \
      tk-dev unzip vim wget \
@@ -69,7 +98,9 @@ RUN \
     wget https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tgz &&\
     tar xzf Python-${PYTHON_VER}.tgz &&\
     (cd Python-${PYTHON_VER} &&\
-    ./configure --enable-optimizations --enable-shared --disable-test-modules LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" &&\
+    ./configure --enable-optimizations --enable-shared \
+      --disable-test-modules \
+      LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" &&\
     make -j `nproc` &&\
     make install) &&\
     ln -s /usr/local/bin/python3 /usr/local/bin/python &&\
@@ -91,23 +122,9 @@ RUN \
      python3 -m pip install --upgrade pip &&\
      python3 -m pip install --no-binary :all: netCDF4==1.7.2 numpy==2.2.2 pyyaml==6.0.2 scipy==1.15.1 xarray==2025.1.2) \
  && echo "Running linker configuration" &&\
-    ldconfig
-
-#
-# - Remove packages containing Critical CVEs:
-#   NAME              INSTALLED               FIXED IN    TYPE VULNERABILITY  SEVERITY EPSS % RISK
-#   zlib1g-dev        1:1.2.13.dfsg-1         (won't fix) deb  CVE-2023-45853 Critical 70.89  0.6
-#   libopenexr-3-1-30 3.1.5-5                 (won't fix) deb  CVE-2023-5841  Critical 70.03  0.6
-#   libaom3           3.6.0-1+deb12u1         (won't fix) deb  CVE-2023-6879  Critical 37.08  0.1
-#   libxml2           2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49794 Critical 23.45  < 0.1
-#   libxml2           2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49796 Critical 18.40  < 0.1
-#   libarchive13      3.6.2-1+deb12u2         (won't fix) deb  CVE-2025-5914  Critical 10.77  < 0.1
-#
-# - Install imagemagick after removal because it was removed as a dependency.
-#   Must install from source with some features like xml excluded because version from apt re-installs problematic
-#   packages that contain critical CVEs.
-#
-RUN apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 \
+    ldconfig \
+ && echo "Remove packages with known CVEs" &&\
+    apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 \
  && echo "Building ImageMagick without XML support" &&\
     wget https://github.com/ImageMagick/ImageMagick/archive/refs/tags/7.1.2-0.tar.gz &&\
     tar xzf 7.1.2-0.tar.gz &&\
@@ -141,5 +158,7 @@ RUN apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 \
     apt install -y libasound2 libatk-bridge2.0-0 libcairo2 libcups2 libgbm1 libnss3 libpango-1.0-0 \
                    libxcomposite1 libxdamage1 libxfixes3 libxkbcommon0 libxrandr2 \
  && echo "Remove libxml2 again because it was added again from chrome dependencies" &&\
-    apt remove -y libxml2 &&\
-    apt clean
+    apt remove -y libxml2 \
+ && echo "Clean apt and remove package list cache files" &&\
+    apt clean &&\
+    rm -rf /var/lib/apt/lists/*
