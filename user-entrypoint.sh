@@ -1,28 +1,30 @@
 #!/bin/bash
 
-# If USER_ID and GROUP_ID are provided, modify the metplus_user accordingly
-if [ -n "${USER_ID:-}" ] && [ -n "${GROUP_ID:-}" ]; then
-      # Special case: if both USER_ID and GROUP_ID are 0, run as root
-    if [ "$USER_ID" = "0" ] && [ "$GROUP_ID" = "0" ]; then
-        echo "Running as root (UID:GID = 0:0)"
-        exec "$@"
-    else
-        echo "Adjusting user metplus_user to UID:GID = $USER_ID:$GROUP_ID"
+if [ "$(id -u)" -eq 0 ]; then
+    # if running as root (e.g. Docker), modify uid/gid and run as metplus_user
 
-        # Modify group first
-        groupmod -g "$GROUP_ID" metplus_user 2>/dev/null || \
-            groupadd -g "$GROUP_ID" metplus_user 2>/dev/null
-
-        # Modify user
-        usermod -u "$USER_ID" -g "$GROUP_ID" metplus_user 2>/dev/null
-
-        # Fix ownership of directories that metplus_user needs to write to
-        chown -R metplus_user:metplus_user /home/metplus_user 2>/dev/null
-
-        # Switch to metplus_user and execute the command
-        exec gosu metplus_user "$@"
+    # if group ID is set and not 0 (root), adjust GID of metplus_user
+    if [ -n "${GROUP_ID:-}" ] && [ "$GROUP_ID" != "0" ]; then
+        echo "Adjusting user metplus_user to GID = $GROUP_ID"
+        groupmod -g "$GROUP_ID" metplus_user
+        usermod -g "$GROUP_ID" metplus_user
     fi
-else
-    # No USER_ID/GROUP_ID provided, use default metplus_user
+
+    # if user ID is set and not 0 (root), adjust UID of metplus_user
+    if [ -n "${USER_ID:-}" ] && [ "$USER_ID" != "0" ]; then
+        echo "Adjusting user metplus_user to UID = $USER_ID"
+        usermod -u "$USER_ID" metplus_user
+    fi
+
+    # change ownership of home dir in case uid or gid of metplus_user were modified
+    chown -R metplus_user:metplus_user /home/metplus_user
+
+    # switch to metplus_user and execute command
     exec gosu metplus_user "$@"
+else
+    # if running as non-root (e.g Apptainer), then skip user/group mods and run
+    echo "Running as non-root user ($(id -un)), skipping user/group modifications"
+
+    # Execute command directly as the current user
+    exec "$@"
 fi
