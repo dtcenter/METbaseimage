@@ -21,7 +21,7 @@ ENV ZLIB_URL=https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/zlib-
 ENV SQLITE3_URL=https://www.sqlite.org/2025/sqlite-autoconf-3500300.tar.gz
 ENV MET_FONT_DIR=/usr/local/share/met/fonts
 
-ENV GOSU_VERSION 1.19
+ENV GOSU_VERSION=1.19
 
 WORKDIR /met
 
@@ -162,7 +162,7 @@ RUN \
  && echo "Remove libxml2 again because it was added again from chrome dependencies" &&\
     apt remove -y libxml2 \
  && echo "Install gosu to be able to switch to non-root user in downstream containers" &&\
-    dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; &&\
+    dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
     gpg --keyserver hkps://keys.openpgp.org --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 &&\
     curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch" &&\
     curl -o /usr/local/bin/gosu.asc -SL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc" &&\
