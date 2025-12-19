@@ -8,10 +8,20 @@ Please see the [MET website](https://dtcenter.org/community-code/model-evaluatio
 Version History
 ===============
 
+v3.5.1
+------
+
+* Update pip install commands to remove deprecated options
+
 v3.5.0
 ------
 
 * Upgrade to Tomcat 10.1.48
+
+v3.4.6
+------
+
+* Update pip install commands to remove deprecated options
 
 v3.4.5
 ------
@@ -51,6 +61,11 @@ v3.4
 ----
 
 * Python 3.12.0 (#30)
+
+v3.3.6
+------
+
+* Update pip install commands to remove deprecated options
 
 v3.3.5
 ------
