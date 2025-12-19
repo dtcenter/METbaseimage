@@ -1,5 +1,5 @@
-ARG MET_BASE_REPO
-ARG MET_BASE_TAG
+ARG MET_BASE_REPO=registry1.dso.mil/ironbank/opensource/debian/debian
+ARG MET_BASE_TAG=12-slim
 FROM ${MET_BASE_REPO}:${MET_BASE_TAG}
 LABEL maintainer="John Halley Gotway <johnhg@ucar.edu>"
 
@@ -17,11 +17,15 @@ ENV CATALINA_HOME=/opt/tomcat
 # Expose METviewer port
 EXPOSE 8080
 
+ENV PYTHON_VER=3.12.11
+
+# - install build-essential, libffi-dev, and libssl-dev for Pip SSL support
+
 RUN \
      echo "Install system updates" &&\
      apt -y update && apt -y upgrade \
   && echo "Install required packages" &&\
-     apt -y install ant ksh mariadb-server openjdk-17-jdk  r-base &&\
+     apt -y install ant build-essential libffi-dev libssl-dev ksh mariadb-server openjdk-17-jdk r-base wget &&\
      apt clean \
   && echo "Setup default cran repo" &&\
      echo "r <- getOption('repos'); r['CRAN'] <- 'http://cran.us.r-project.org'; options(repos = r);" > ~/.Rprofile \
@@ -37,6 +41,16 @@ RUN \
      rm apache-tomcat*.tar.gz &&\
      mv apache-tomcat* ${CATALINA_HOME} &&\
      chmod +x ${CATALINA_HOME}/bin/*sh \
+ && echo "Install Python from source" &&\
+    wget https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tgz &&\
+    tar xzf Python-${PYTHON_VER}.tgz &&\
+    (cd Python-${PYTHON_VER} &&\
+    ./configure --enable-optimizations --enable-shared --disable-test-modules \
+      LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" &&\
+    make -j `nproc` &&\
+    make install) &&\
+    ln -s /usr/local/bin/python3 /usr/local/bin/python &&\
+    rm -rf Python-${PYTHON_VER}* \
   && echo "Create a link for python3" &&\
      ln -sf /usr/local/bin/python3  /usr/bin/python3 &&\
      ln -sf /usr/bin/python3  /usr/bin/python &&\
@@ -47,13 +61,6 @@ WORKDIR /tmp
 
 #
 # - Install Python packages needed for METplus Analysis Python tools
-# - Remove packages containing Critical CVEs:
-#   NAME         INSTALLED               FIXED IN    TYPE VULNERABILITY  SEVERITY EPSS %        RISK
-#   zlib1g-dev   1:1.2.13.dfsg-1         (won't fix) deb  CVE-2023-45853 Critical 0.7% (70th)   0.6
-#   libxml2      2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49794 Critical < 0.1% (23rd) < 0.1
-#   libxml2      2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49796 Critical < 0.1% (18th) < 0.1
-#   libfcgi-bin  2.4.2-2                 (won't fix) deb  CVE-2025-23016 Critical < 0.1% (11th) < 0.1
-#   libfcgi0ldbl 2.4.2-2                 (won't fix) deb  CVE-2025-23016 Critical < 0.1% (11th) < 0.1
 #
 
 RUN echo "Install GEOS - needed for cartopy" &&\
@@ -61,38 +68,39 @@ RUN echo "Install GEOS - needed for cartopy" &&\
     (cd geos-3.7.2 && ./configure && make clean && make && make install && ldconfig) &&\
      rm -r geos-3.7.2.tar.bz2 \
   && echo "Install Python packages" \
-  && pip install cartopy \
-  && pip install eofs \
-  && pip install imutils \
-  && pip install imageio \
-  && pip install lxml \
-  && pip install matplotlib \
-  && pip install netcdf4 \
-  && pip install numpy \
-  && pip install pytest \
-  && pip install metpy \
-  && pip install pyyaml \
-  && pip install scikit-image \
-  && pip install scikit-learn \
-  && pip install scipy \
-  && pip install xarray \
-  && pip install PyMySQL \
-  && pip install pint \
-  && pip install plotly \
-  && pip install kaleido \
-  && pip install attrs \
-  && pip install exceptiongroup \
-  && pip install iniconfig \
-  && pip install packaging \
-  && pip install pluggy \
-  && pip install pytz \
-  && pip install setuptools \
-  && pip install six \
-  && pip install tomli \
-  && pip install wheel \
-  && pip install python-dateutil \
-  && pip install opencv-python \
-  && pip install pandas &&\
-     echo "removing packages containing critcal CVEs" \
-  && apt remove -y zlib1g-dev libxml2 libfcgi-bin libfcgi0ldbl \
+  && pip install PyMySQL\
+      attrs \
+      cartopy \
+      eofs \
+      exceptiongroup \
+      imageio \
+      imutils \
+      iniconfig \
+      kaleido \
+      lxml \
+      matplotlib \
+      metpy \
+      netCDF4 \
+      numpy \
+      opencv-python \
+      packaging \
+      pandas \
+      pint \
+      plotly \
+      pluggy \
+      pytest \
+      python-dateutil \
+      pytz \
+      pyyaml \
+      scikit-image \
+      scikit-learn \
+      scipy \
+      setuptools \
+      six \
+      tomli \
+      wheel \
+      xarray \
+  && echo "Install chrome for plotly/kaleido" &&\
+     wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb &&\
+     apt-get install -y ./google-chrome-stable_current_amd64.deb \
   && apt clean
