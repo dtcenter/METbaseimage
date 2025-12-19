@@ -31,6 +31,7 @@ env:
   DOCKERHUB_BASE_REPO: dtcenter/met-base-dev
   DOCKERHUB_UNIT_TEST_REPO: dtcenter/met-base-unit-test-dev
   DOCKERHUB_METVIEWER_REPO: dtcenter/met-base-metviewer-dev
+  DEBIAN_REPO: registry1.dso.mil/ironbank/opensource/debian/debian
 
 jobs:
 
@@ -77,6 +78,9 @@ jobs:
 
       - name: Create directories to store build log output
         run: mkdir -p ${RUNNER_WORKSPACE}/logs
+
+      - name: Authenticate IronBank
+        run: echo "${{ secrets.IRONBANK_SECRET }}" | docker login -u ${{ secrets.IRONBANK_USERNAME }} --password-stdin registry1.dso.mil
 
       - name: Build Docker Image
         run: .github/jobs/build_docker_image.sh
