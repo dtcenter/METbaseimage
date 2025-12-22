@@ -1,5 +1,5 @@
-ARG MET_BASE_REPO
-ARG MET_BASE_TAG
+ARG MET_BASE_REPO=debian
+ARG MET_BASE_TAG=12-slim
 FROM ${MET_BASE_REPO}:${MET_BASE_TAG}
 LABEL maintainer="John Halley Gotway <johnhg@ucar.edu>"
 
