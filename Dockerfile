@@ -1,5 +1,6 @@
 ARG DEBIAN_VERSION=12
-FROM debian:${DEBIAN_VERSION}-slim
+ARG BASE_REPO=debian
+FROM ${BASE_REPO}:${DEBIAN_VERSION}-slim
 LABEL maintainer="George McCabe <mccabe@ucar.edu>"
 
 ARG MET_COMPILE_SCRIPT_BRANCH=main_v12.1
