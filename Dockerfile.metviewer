@@ -14,6 +14,10 @@ ENV TOMCAT_VERSION=${TOMCAT_MAJOR_VERSION}.${TOMCAT_MINOR_VERSION}
 ENV TOMCAT_URL=https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/apache-tomcat-${TOMCAT_VERSION}.tar.gz
 ENV CATALINA_HOME=/opt/tomcat
 
+ENV SQLITE3_URL=https://www.sqlite.org/2025/sqlite-autoconf-3500300.tar.gz
+
+ENV PYTHON_VER=3.12.12
+
 # Expose METviewer port
 EXPOSE 8080
 
@@ -21,8 +25,24 @@ RUN \
      echo "Install system updates" &&\
      apt -y update && apt -y upgrade \
   && echo "Install required packages" &&\
-     apt -y install ant ksh mariadb-server openjdk-17-jdk  r-base &&\
+     apt -y install ant build-essential equivs libffi-dev libssl-dev ksh mariadb-server openjdk-17-jdk r-base wget &&\
      apt clean \
+ && echo "Downloading and installing sqlite3 from ${SQLITE3_URL}" &&\
+    wget ${SQLITE3_URL} &&\
+    filename=$(basename ${SQLITE3_URL}) &&\
+    tar xzf ${filename} &&\
+    (cd ${filename%%.*} && ./configure && make -j $(nproc) && make install) &&\
+    echo "/usr/local/lib" > /etc/ld.so.conf.d/usr-local.conf && ldconfig \
+ && echo "Create dummy packages to prevent reinstallation of packages with CVEs" &&\
+    ( \
+        echo 'Package: libsqlite3-0'; \
+        echo 'Version: 9:9.9.9'; \
+        echo 'Architecture: amd64'; \
+        echo 'Maintainer: Dummy Pkg'; \
+        echo 'Description: Dummy package to satisfy libnss3 dependency with source-built sqlite3'; \
+    ) > /tmp/libsqlite3-0.control && \
+    equivs-build /tmp/libsqlite3-0.control &&\
+    dpkg -i libsqlite3-0_9.9.9_amd64.deb \
   && echo "Setup default cran repo" &&\
      echo "r <- getOption('repos'); r['CRAN'] <- 'http://cran.us.r-project.org'; options(repos = r);" > ~/.Rprofile \
   && echo "Install required R packages" &&\
@@ -37,6 +57,18 @@ RUN \
      rm apache-tomcat*.tar.gz &&\
      mv apache-tomcat* ${CATALINA_HOME} &&\
      chmod +x ${CATALINA_HOME}/bin/*sh \
+ && echo "Uninstall Python 3.11" &&\
+    apt remove -y python3.11 \
+ && echo "Install Python from source" &&\
+    wget https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tgz &&\
+    tar xzf Python-${PYTHON_VER}.tgz &&\
+    (cd Python-${PYTHON_VER} &&\
+    ./configure --enable-optimizations --enable-shared --disable-test-modules \
+      LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" &&\
+    make -j `nproc` &&\
+    make install) &&\
+    ln -s /usr/local/bin/python3 /usr/local/bin/python &&\
+    rm -rf Python-${PYTHON_VER}* \
   && echo "Create a link for python3" &&\
      ln -sf /usr/local/bin/python3  /usr/bin/python3 &&\
      ln -sf /usr/bin/python3  /usr/bin/python &&\
@@ -92,7 +124,10 @@ RUN echo "Install GEOS - needed for cartopy" &&\
   && pip install wheel \
   && pip install python-dateutil \
   && pip install opencv-python \
-  && pip install pandas &&\
-     echo "removing packages containing critcal CVEs" \
+  && pip install pandas \
+  && echo "Install chrome for plotly/kaleido" &&\
+     wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb &&\
+     apt-get install -y ./google-chrome-stable_current_amd64.deb \
+     echo "removing packages containing critical CVEs" \
   && apt remove -y zlib1g-dev libxml2 libfcgi-bin libfcgi0ldbl \
   && apt clean
