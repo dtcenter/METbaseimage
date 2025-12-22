@@ -64,6 +64,10 @@ jobs:
     name: Build, Scan, and Push Images
     runs-on: ubuntu-latest
     needs: job_control
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [met, metviewer]
 
     steps:
       - uses: actions/checkout@v4
@@ -83,11 +87,12 @@ jobs:
         run: echo "${{ secrets.IRONBANK_SECRET }}" | docker login -u ${{ secrets.IRONBANK_USERNAME }} --password-stdin registry1.dso.mil
 
       - name: Build Docker Image
-        run: .github/jobs/build_docker_image.sh
+        run: .github/jobs/build_docker_image.sh ${{ matrix.component }}
         env:
           GITHUB_NAME: ${{ needs.job_control.outputs.github_name }}
 
-      - name: Scan Docker Images
+      - name: Scan MET Docker Images
+        if: ${{ matrix.component == 'met' }}
         id: scan
         continue-on-error: true
         uses: dtcenter/metplus-action-scan-docker-images@v1
@@ -95,14 +100,25 @@ jobs:
           images: |
             [
               "${{ env.DOCKERHUB_BASE_REPO }}:${{ needs.job_control.outputs.github_name }}",
-              "${{ env.DOCKERHUB_UNIT_TEST_REPO }}:${{ needs.job_control.outputs.github_name }}",
+              "${{ env.DOCKERHUB_UNIT_TEST_REPO }}:${{ needs.job_control.outputs.github_name }}"
+            ]
+          fail-on-critical: "true"
+
+      - name: Scan METviewer Docker Images
+        if: ${{ matrix.component == 'metviewer' }}
+        id: scan
+        continue-on-error: true
+        uses: dtcenter/metplus-action-scan-docker-images@v1
+        with:
+          images: |
+            [
               "${{ env.DOCKERHUB_METVIEWER_REPO }}:${{ needs.job_control.outputs.github_name }}"
             ]
           fail-on-critical: "true"
 
       - name: Push Docker Image
         if: ${{ needs.job_control.outputs.push_image == 'true' }}
-        run: .github/jobs/push_docker_image.sh
+        run: .github/jobs/push_docker_image.sh ${{ matrix.component }}
         env:
           GITHUB_NAME: ${{ needs.job_control.outputs.github_name }}
           DOCKER_USERNAME: 'dtcenter'
@@ -116,7 +132,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: build_logs
+          name: build_${{ matrix.component }}_logs
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 

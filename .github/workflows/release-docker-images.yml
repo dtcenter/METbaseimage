@@ -68,7 +68,7 @@ jobs:
               matrix+=\"${version}\",
             fi
           done
-          matrix+="]}"
+          matrix+="],\"component\": [\"met\", \"metviewer\"]}"
           echo "matrix=${matrix}" >> $GITHUB_OUTPUT
           echo "update_latest=${update_latest}" >> $GITHUB_OUTPUT
 
@@ -111,24 +111,35 @@ jobs:
         run: echo "${{ secrets.IRONBANK_SECRET }}" | docker login -u ${{ secrets.IRONBANK_USERNAME }} --password-stdin registry1.dso.mil
 
       - name: Build Docker Image
-        run: .github/jobs/build_docker_image.sh
+        run: .github/jobs/build_docker_image.sh ${{ matrix.component }}
         env:
           GITHUB_NAME: ${{ matrix.version }}
 
-      - name: Scan Docker Images
+      - name: Scan MET Docker Images
+        if: ${{ matrix.component == 'met' }}
         uses: dtcenter/metplus-action-scan-docker-images@v1
         with:
           images: |
             [
               "${{ steps.get-dockerhub-tags.outputs.base_repo_tag }}",
-              "${{ steps.get-dockerhub-tags.outputs.unit_test_repo_tag }}",
+              "${{ steps.get-dockerhub-tags.outputs.unit_test_repo_tag }}"
+            ]
+          fail-on-critical: "true"
+          log-artifact-name: "security-scan-logs_${{ matrix.component }}_${{ matrix.version }}"
+
+      - name: Scan METviewer Docker Images
+        if: ${{ matrix.component == 'metviewer' }}
+        uses: dtcenter/metplus-action-scan-docker-images@v1
+        with:
+          images: |
+            [
               "${{ steps.get-dockerhub-tags.outputs.metviewer_repo_tag }}"
             ]
           fail-on-critical: "true"
-          log-artifact-name: "security-scan-logs_${{ matrix.version }}"
+          log-artifact-name: "security-scan-logs_${{ matrix.component }}_${{ matrix.version }}"
 
       - name: Push Docker Image
-        run: .github/jobs/push_docker_image.sh
+        run: .github/jobs/push_docker_image.sh ${{ matrix.component }}
         env:
           GITHUB_NAME: ${{ matrix.version }}
           UPDATE_LATEST: ${{ fromJSON(needs.define-matrix.outputs.update_latest) }}
@@ -143,6 +154,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: build_logs_${{ matrix.version }}
+          name: build_logs_${{ matrix.component }}_${{ matrix.version }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
