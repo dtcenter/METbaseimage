@@ -128,6 +128,6 @@ RUN echo "Install GEOS - needed for cartopy" &&\
   && echo "Install chrome for plotly/kaleido" &&\
      wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb &&\
      apt-get install -y ./google-chrome-stable_current_amd64.deb \
-     echo "removing packages containing critical CVEs" \
-  && apt remove -y zlib1g-dev libxml2 libfcgi-bin libfcgi0ldbl \
+  && echo "removing packages containing critical CVEs" &&\
+     apt remove -y zlib1g-dev libxml2 libfcgi-bin libfcgi0ldbl \
   && apt clean
