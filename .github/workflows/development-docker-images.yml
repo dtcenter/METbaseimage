@@ -91,28 +91,16 @@ jobs:
         env:
           GITHUB_NAME: ${{ needs.job_control.outputs.github_name }}
 
-      - name: Scan MET Docker Images
-        if: ${{ matrix.component == 'met' }}
+      # scan DOCKERHUB_BASE_REPO and DOCKERHUB_UNIT_TEST_REPO if component is met
+      # scan DOCKERHUB_METVIEWER_REPO if component is metviewer
+      - name: Scan Docker Images
         id: scan
         continue-on-error: true
         uses: dtcenter/metplus-action-scan-docker-images@v1
         with:
           images: |
             [
-              "${{ env.DOCKERHUB_BASE_REPO }}:${{ needs.job_control.outputs.github_name }}",
-              "${{ env.DOCKERHUB_UNIT_TEST_REPO }}:${{ needs.job_control.outputs.github_name }}"
-            ]
-          fail-on-critical: "true"
-
-      - name: Scan METviewer Docker Images
-        if: ${{ matrix.component == 'metviewer' }}
-        id: scan
-        continue-on-error: true
-        uses: dtcenter/metplus-action-scan-docker-images@v1
-        with:
-          images: |
-            [
-              "${{ env.DOCKERHUB_METVIEWER_REPO }}:${{ needs.job_control.outputs.github_name }}"
+              ${{ matrix.component == 'met' && format('"{0}:{2}", "{1}:{2}"', env.DOCKERHUB_BASE_REPO, env.DOCKERHUB_UNIT_TEST_REPO, needs.job_control.outputs.github_name) || format('"{0}:{1}"', env.DOCKERHUB_METVIEWER_REPO, needs.job_control.outputs.github_name) }}
             ]
           fail-on-critical: "true"
 
