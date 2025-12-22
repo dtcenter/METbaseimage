@@ -111,9 +111,10 @@ jobs:
         run: echo "${{ secrets.IRONBANK_SECRET }}" | docker login -u ${{ secrets.IRONBANK_USERNAME }} --password-stdin registry1.dso.mil
 
       - name: Build Docker Image
-        run: .github/jobs/build_docker_image.sh ${{ matrix.component }}
+        run: .github/jobs/build_docker_image.sh
         env:
           GITHUB_NAME: ${{ matrix.version }}
+          METPLUS_COMPONENT: ${{ matrix.component }}
 
       # scan base_repo_tag and unit_test_repo_tag if component is met
       # scan metviewer_repo_tag if component is metviewer
@@ -128,9 +129,10 @@ jobs:
           log-artifact-name: "security-scan-logs_${{ matrix.component }}_${{ matrix.version }}"
 
       - name: Push Docker Image
-        run: .github/jobs/push_docker_image.sh ${{ matrix.component }}
+        run: .github/jobs/push_docker_image.sh
         env:
           GITHUB_NAME: ${{ matrix.version }}
+          METPLUS_COMPONENT: ${{ matrix.component }}
           UPDATE_LATEST: ${{ fromJSON(needs.define-matrix.outputs.update_latest) }}
           DOCKER_USERNAME: 'dtcenter'
           DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}

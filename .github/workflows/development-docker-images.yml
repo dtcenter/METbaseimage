@@ -87,9 +87,10 @@ jobs:
         run: echo "${{ secrets.IRONBANK_SECRET }}" | docker login -u ${{ secrets.IRONBANK_USERNAME }} --password-stdin registry1.dso.mil
 
       - name: Build Docker Image
-        run: .github/jobs/build_docker_image.sh ${{ matrix.component }}
+        run: .github/jobs/build_docker_image.sh
         env:
           GITHUB_NAME: ${{ needs.job_control.outputs.github_name }}
+          METPLUS_COMPONENT: ${{ matrix.component }}
 
       # scan DOCKERHUB_BASE_REPO and DOCKERHUB_UNIT_TEST_REPO if component is met
       # scan DOCKERHUB_METVIEWER_REPO if component is metviewer
@@ -106,9 +107,10 @@ jobs:
 
       - name: Push Docker Image
         if: ${{ needs.job_control.outputs.push_image == 'true' }}
-        run: .github/jobs/push_docker_image.sh ${{ matrix.component }}
+        run: .github/jobs/push_docker_image.sh
         env:
           GITHUB_NAME: ${{ needs.job_control.outputs.github_name }}
+          METPLUS_COMPONENT: ${{ matrix.component }}
           DOCKER_USERNAME: 'dtcenter'
           DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
 
