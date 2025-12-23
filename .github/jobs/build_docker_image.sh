@@ -42,6 +42,8 @@ if [ "$METPLUS_COMPONENT" == "met" ]; then
       echo "::endgroup::"
       exit 1
     fi
+    # end of MET and MET unit test section
+    exit 0
 fi
 
 # exit if METplus component is not set to either met or metviewer
