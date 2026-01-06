@@ -1,6 +1,6 @@
-ARG MET_BASE_REPO=registry1.dso.mil/ironbank/opensource/debian/debian
-ARG MET_BASE_TAG=12-slim
-FROM ${MET_BASE_REPO}:${MET_BASE_TAG}
+ARG BASE_REPO=debian
+ARG BASE_TAG=12-slim
+FROM ${BASE_REPO}:${BASE_TAG}
 LABEL maintainer="John Halley Gotway <johnhg@ucar.edu>"
 
 #

@@ -21,6 +21,7 @@ if [ "$METPLUS_COMPONENT" == "met" ]; then
     CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build_met_base_image.log
 
     if ! time_command docker build -t ${DOCKERHUB_TAG_BASE} \
+         --build-arg BASE_REPO=${DEBIAN_REPO} \
          -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}; then
       echo "::group::${GITHUB_WORKSPACE}/docker_build_met_base_image.log"
       cat ${GITHUB_WORKSPACE}/docker_build_met_base_image.log
@@ -58,7 +59,7 @@ DOCKERFILE_PATH=${GITHUB_WORKSPACE}/${GITHUB_NAME}/Dockerfile.metviewer
 CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build_met_base_metviewer_image.log
 
 if ! time_command docker build -t ${DOCKERHUB_TAG_METVIEWER} \
-     --build-arg MET_BASE_REPO=${DEBIAN_REPO} \
+     --build-arg BASE_REPO=${DEBIAN_REPO} \
      -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}; then
   echo "::group::${GITHUB_WORKSPACE}/docker_build_met_base_metviewer_image.log"
   cat ${GITHUB_WORKSPACE}/docker_build_met_base_metviewer_image.log
