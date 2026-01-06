@@ -59,8 +59,17 @@ RUN \
      rm apache-tomcat*.tar.gz &&\
      mv apache-tomcat* ${CATALINA_HOME} &&\
      chmod +x ${CATALINA_HOME}/bin/*sh \
- && echo "Uninstall Python 3.11" &&\
-    apt remove -y python3.11 \
+  && echo "Create dummy python3 package to prevent installation of python3.11 with chrome" &&\
+     ( \
+        echo 'Package: python3'; \
+        echo 'Version: 3.12.12-dummy'; \
+        echo 'Architecture: amd64'; \
+        echo 'Maintainer: Dummy Pkg'; \
+        echo 'Description: Dummy package to satisfy chrome dependency'; \
+        echo 'Provides: python3.11, python3-minimal'; \
+    ) > /tmp/python3.control && \
+    equivs-build /tmp/python3.control &&\
+    dpkg -i python3_3.12.12-dummy_amd64.deb \
  && echo "Install Python from source" &&\
     wget https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tgz &&\
     tar xzf Python-${PYTHON_VER}.tgz &&\
