@@ -122,6 +122,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: build_${{ matrix.component }}_logs
+          name: build_logs_${{ matrix.component }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
