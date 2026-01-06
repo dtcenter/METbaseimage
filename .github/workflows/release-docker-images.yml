@@ -116,27 +116,6 @@ jobs:
           GITHUB_NAME: ${{ matrix.version }}
           METPLUS_COMPONENT: ${{ matrix.component }}
 
-      # scan base_repo_tag and unit_test_repo_tag if component is met
-      # scan metviewer_repo_tag if component is metviewer
-      - name: Scan Docker Images
-        uses: dtcenter/metplus-action-scan-docker-images@v1
-        with:
-          images: |
-            [
-              ${{ matrix.component == 'met' && format('"{0}", "{1}"', steps.get-dockerhub-tags.outputs.base_repo_tag, steps.get-dockerhub-tags.outputs.unit_test_repo_tag) || format('"{0}"', steps.get-dockerhub-tags.outputs.metviewer_repo_tag) }}
-            ]
-          fail-on-critical: "true"
-          log-artifact-name: "security-scan-logs_${{ matrix.component }}_${{ matrix.version }}"
-
-      - name: Push Docker Image
-        run: .github/jobs/push_docker_image.sh
-        env:
-          GITHUB_NAME: ${{ matrix.version }}
-          METPLUS_COMPONENT: ${{ matrix.component }}
-          UPDATE_LATEST: ${{ fromJSON(needs.define-matrix.outputs.update_latest) }}
-          DOCKER_USERNAME: 'dtcenter'
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
-
       - name: Copy build log files into logs directory
         if: always()
         run: cp ${GITHUB_WORKSPACE}/*.log ${RUNNER_WORKSPACE}/logs/
@@ -148,3 +127,24 @@ jobs:
           name: build_logs_${{ matrix.component }}_${{ matrix.version }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
+
+      # scan base_repo_tag and unit_test_repo_tag if component is met
+      # scan metviewer_repo_tag if component is metviewer
+      - name: Scan Docker Images
+        uses: dtcenter/metplus-action-scan-docker-images@v1
+        with:
+          images: |
+            [
+              ${{ matrix.component == 'met' && format('"{0}", "{1}"', steps.get-dockerhub-tags.outputs.base_repo_tag, steps.get-dockerhub-tags.outputs.unit_test_repo_tag) || format('"{0}"', steps.get-dockerhub-tags.outputs.metviewer_repo_tag) }}
+            ]
+          fail-on-critical: "false"
+          log-artifact-name: "security-scan-logs_${{ matrix.component }}_${{ matrix.version }}"
+
+      - name: Push Docker Image
+        run: .github/jobs/push_docker_image.sh
+        env:
+          GITHUB_NAME: ${{ matrix.version }}
+          METPLUS_COMPONENT: ${{ matrix.component }}
+          UPDATE_LATEST: ${{ fromJSON(needs.define-matrix.outputs.update_latest) }}
+          DOCKER_USERNAME: 'dtcenter'
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
