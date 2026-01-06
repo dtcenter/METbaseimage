@@ -92,6 +92,18 @@ jobs:
           GITHUB_NAME: ${{ needs.job_control.outputs.github_name }}
           METPLUS_COMPONENT: ${{ matrix.component }}
 
+      - name: Copy build log files into logs directory
+        if: always()
+        run: cp ${GITHUB_WORKSPACE}/*.log ${RUNNER_WORKSPACE}/logs/
+
+      - name: Upload build logs as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build_logs_${{ matrix.component }}
+          path: ${{ runner.workspace }}/logs
+          if-no-files-found: ignore
+
       # scan DOCKERHUB_BASE_REPO and DOCKERHUB_UNIT_TEST_REPO if component is met
       # scan DOCKERHUB_METVIEWER_REPO if component is metviewer
       - name: Scan Docker Images
@@ -113,15 +125,3 @@ jobs:
           METPLUS_COMPONENT: ${{ matrix.component }}
           DOCKER_USERNAME: 'dtcenter'
           DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
-
-      - name: Copy build log files into logs directory
-        if: always()
-        run: cp ${GITHUB_WORKSPACE}/*.log ${RUNNER_WORKSPACE}/logs/
-
-      - name: Upload build logs as artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build_logs_${{ matrix.component }}
-          path: ${{ runner.workspace }}/logs
-          if-no-files-found: ignore
