@@ -21,7 +21,10 @@ EXPOSE 8080
 
 ENV PYTHON_VER=3.12.12
 
+WORKDIR /tmp
+
 # - install build-essential, libffi-dev, and libssl-dev for Pip SSL support
+# - Install Python packages needed for METplus Analysis Python tools
 
 RUN \
      echo "Install system updates" &&\
@@ -59,17 +62,6 @@ RUN \
      rm apache-tomcat*.tar.gz &&\
      mv apache-tomcat* ${CATALINA_HOME} &&\
      chmod +x ${CATALINA_HOME}/bin/*sh \
-  && echo "Create dummy python3 package to prevent installation of python3.11 with chrome" &&\
-     ( \
-        echo 'Package: python3'; \
-        echo 'Version: 3.12.12-dummy'; \
-        echo 'Architecture: amd64'; \
-        echo 'Maintainer: Dummy Pkg'; \
-        echo 'Description: Dummy package to satisfy chrome dependency'; \
-        echo 'Provides: python3.11, python3-minimal'; \
-    ) > /tmp/python3.control && \
-    equivs-build /tmp/python3.control &&\
-    dpkg -i python3_3.12.12-dummy_amd64.deb \
  && echo "Install Python from source" &&\
     wget https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tgz &&\
     tar xzf Python-${PYTHON_VER}.tgz &&\
@@ -84,17 +76,21 @@ RUN \
      ln -sf /usr/local/bin/python3  /usr/bin/python3 &&\
      ln -sf /usr/bin/python3  /usr/bin/python &&\
      ln -sf /usr/local/bin/pip3  /usr/bin/pip3 &&\
-     ln -sf /usr/bin/pip3  /usr/bin/pip
-
-WORKDIR /tmp
-
-#
-# - Install Python packages needed for METplus Analysis Python tools
-#
-
-RUN echo "Install GEOS - needed for cartopy" &&\
-    wget http://download.osgeo.org/geos/geos-3.7.2.tar.bz2 && tar xjf geos-3.7.2.tar.bz2 &&\
-    (cd geos-3.7.2 && ./configure && make clean && make && make install && ldconfig) &&\
+     ln -sf /usr/bin/pip3  /usr/bin/pip \
+  && echo "Create dummy python3 package to prevent installation of python3.11 with chrome" &&\
+     ( \
+        echo 'Package: python3-dummy'; \
+        echo 'Version: ${PYTHON_VER}'; \
+        echo 'Architecture: amd64'; \
+        echo 'Maintainer: Dummy Pkg'; \
+        echo 'Description: Dummy package to satisfy chrome dependency'; \
+        echo 'Provides: python3, python3.11, python3-minimal, python3.11-minimal, libpython3.11-minimal, libpython3.11-stdlib'; \
+     ) > /tmp/python3-dummy.control && \
+     equivs-build /tmp/python3-dummy.control &&\
+     dpkg -i python3-dummy_${PYTHON_VER}_amd64.deb \
+  && echo "Install GEOS - needed for cartopy" &&\
+     wget http://download.osgeo.org/geos/geos-3.7.2.tar.bz2 && tar xjf geos-3.7.2.tar.bz2 &&\
+     (cd geos-3.7.2 && ./configure && make clean && make && make install && ldconfig) &&\
      rm -r geos-3.7.2.tar.bz2 \
   && echo "Install Python packages" \
   && pip install PyMySQL\
