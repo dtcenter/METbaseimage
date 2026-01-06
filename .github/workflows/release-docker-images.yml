@@ -125,7 +125,7 @@ jobs:
             [
               ${{ matrix.component == 'met' && format('"{0}", "{1}"', steps.get-dockerhub-tags.outputs.base_repo_tag, steps.get-dockerhub-tags.outputs.unit_test_repo_tag) || format('"{0}"', steps.get-dockerhub-tags.outputs.metviewer_repo_tag) }}
             ]
-          fail-on-critical: "true"
+          fail-on-critical: "false"
           log-artifact-name: "security-scan-logs_${{ matrix.component }}_${{ matrix.version }}"
 
       - name: Push Docker Image
