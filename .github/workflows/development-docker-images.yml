@@ -104,6 +104,7 @@ jobs:
               ${{ matrix.component == 'met' && format('"{0}:{2}", "{1}:{2}"', env.DOCKERHUB_BASE_REPO, env.DOCKERHUB_UNIT_TEST_REPO, needs.job_control.outputs.github_name) || format('"{0}:{1}"', env.DOCKERHUB_METVIEWER_REPO, needs.job_control.outputs.github_name) }}
             ]
           fail-on-critical: "true"
+          log-artifact-name: "security-scan-logs_${{ matrix.component }}"
 
       - name: Push Docker Image
         if: ${{ needs.job_control.outputs.push_image == 'true' }}
