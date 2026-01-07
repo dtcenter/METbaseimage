@@ -30,7 +30,8 @@ RUN \
      echo "Install system updates" &&\
      apt -y update && apt -y upgrade \
   && echo "Install required packages" &&\
-     apt -y install ant build-essential equivs git libffi-dev libssl-dev ksh mariadb-server openjdk-17-jdk r-base wget &&\
+     apt -y install ant build-essential equivs git libffi-dev libssl-dev ksh \
+                    mariadb-server openjdk-17-jdk r-base wget &&\
      apt clean \
  && echo "Downloading and installing sqlite3 from ${SQLITE3_URL}" &&\
     wget ${SQLITE3_URL} &&\
@@ -84,7 +85,8 @@ RUN \
         echo 'Architecture: amd64'; \
         echo 'Maintainer: Dummy Pkg'; \
         echo 'Description: Dummy package to satisfy chrome dependency'; \
-        echo 'Provides: python3, python3.11, python3-minimal, python3.11-minimal, libpython3.11-minimal, libpython3-stdlib, libpython3.11-stdlib'; \
+        echo 'Provides: python3, python3.11, python3-minimal, python3.11-minimal,' \
+             'libpython3.11, libpython3.11-minimal, libpython3-stdlib, libpython3.11-stdlib'; \
      ) > /tmp/python3.control && \
      equivs-build /tmp/python3.control &&\
      dpkg -i python3_${PYTHON_VER}_amd64.deb \
@@ -129,5 +131,5 @@ RUN \
      wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb &&\
      apt-get install -y ./google-chrome-stable_current_amd64.deb \
   && echo "Remove packages with CVEs" &&\
-     apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 libpython3.11-minimal &&\
+     apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 &&\
      apt clean
