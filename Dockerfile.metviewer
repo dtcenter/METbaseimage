@@ -23,11 +23,25 @@ ENV PYTHON_VER=3.12.12
 # Expose METviewer port
 EXPOSE 8080
 
+WORKDIR /tmp
+
+# install system updates, required packages
+# - Install Python packages needed for METplus Analysis Python tools
+# - Remove packages containing Critical CVEs:
+#   NAME         INSTALLED               FIXED IN    TYPE VULNERABILITY  SEVERITY EPSS %        RISK
+#   zlib1g-dev   1:1.2.13.dfsg-1         (won't fix) deb  CVE-2023-45853 Critical 0.7% (70th)   0.6
+#   libxml2      2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49794 Critical < 0.1% (23rd) < 0.1
+#   libxml2      2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49796 Critical < 0.1% (18th) < 0.1
+#   libfcgi-bin  2.4.2-2                 (won't fix) deb  CVE-2025-23016 Critical < 0.1% (11th) < 0.1
+#   libfcgi0ldbl 2.4.2-2                 (won't fix) deb  CVE-2025-23016 Critical < 0.1% (11th) < 0.1
+#
+
 RUN \
      echo "Install system updates" &&\
      apt -y update && apt -y upgrade \
   && echo "Install required packages" &&\
-     apt -y install ant build-essential equivs git libffi-dev libssl-dev ksh mariadb-server openjdk-17-jdk r-base wget &&\
+     apt -y install ant build-essential equivs git libffi-dev libssl-dev ksh \
+                    mariadb-server openjdk-17-jdk r-base wget &&\
      apt clean \
  && echo "Downloading and installing sqlite3 from ${SQLITE3_URL}" &&\
     wget ${SQLITE3_URL} &&\
@@ -59,8 +73,6 @@ RUN \
      rm apache-tomcat*.tar.gz &&\
      mv apache-tomcat* ${CATALINA_HOME} &&\
      chmod +x ${CATALINA_HOME}/bin/*sh \
- && echo "Uninstall Python 3.11" &&\
-    apt remove -y python3.11 \
  && echo "Install Python from source" &&\
     wget https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tgz &&\
     tar xzf Python-${PYTHON_VER}.tgz &&\
@@ -75,24 +87,22 @@ RUN \
      ln -sf /usr/local/bin/python3  /usr/bin/python3 &&\
      ln -sf /usr/bin/python3  /usr/bin/python &&\
      ln -sf /usr/local/bin/pip3  /usr/bin/pip3 &&\
-     ln -sf /usr/bin/pip3  /usr/bin/pip
-
-WORKDIR /tmp
-
-#
-# - Install Python packages needed for METplus Analysis Python tools
-# - Remove packages containing Critical CVEs:
-#   NAME         INSTALLED               FIXED IN    TYPE VULNERABILITY  SEVERITY EPSS %        RISK
-#   zlib1g-dev   1:1.2.13.dfsg-1         (won't fix) deb  CVE-2023-45853 Critical 0.7% (70th)   0.6
-#   libxml2      2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49794 Critical < 0.1% (23rd) < 0.1
-#   libxml2      2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49796 Critical < 0.1% (18th) < 0.1
-#   libfcgi-bin  2.4.2-2                 (won't fix) deb  CVE-2025-23016 Critical < 0.1% (11th) < 0.1
-#   libfcgi0ldbl 2.4.2-2                 (won't fix) deb  CVE-2025-23016 Critical < 0.1% (11th) < 0.1
-#
-
-RUN echo "Install GEOS - needed for cartopy" &&\
-    wget http://download.osgeo.org/geos/geos-3.7.2.tar.bz2 && tar xjf geos-3.7.2.tar.bz2 &&\
-    (cd geos-3.7.2 && ./configure && make clean && make && make install && ldconfig) &&\
+     ln -sf /usr/bin/pip3  /usr/bin/pip \
+  && echo "Create dummy python3 package to prevent installation of python3.11 with chrome" &&\
+     ( \
+        echo 'Package: python3'; \
+        echo "Version: ${PYTHON_VER}"; \
+        echo 'Architecture: amd64'; \
+        echo 'Maintainer: Dummy Pkg'; \
+        echo 'Description: Dummy package to satisfy chrome dependency'; \
+        echo 'Provides: python3, python3.11, python3-minimal, python3.11-minimal,' \
+             'libpython3.11, libpython3.11-minimal, libpython3-stdlib, libpython3.11-stdlib'; \
+     ) > /tmp/python3.control && \
+     equivs-build /tmp/python3.control &&\
+     dpkg -i python3_${PYTHON_VER}_amd64.deb \
+  && echo "Install GEOS - needed for cartopy" &&\
+     wget http://download.osgeo.org/geos/geos-3.7.2.tar.bz2 && tar xjf geos-3.7.2.tar.bz2 &&\
+     (cd geos-3.7.2 && ./configure && make clean && make && make install && ldconfig) &&\
      rm -r geos-3.7.2.tar.bz2 \
   && echo "Install Python packages" \
   && pip install cartopy \
@@ -131,5 +141,5 @@ RUN echo "Install GEOS - needed for cartopy" &&\
      wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb &&\
      apt-get install -y ./google-chrome-stable_current_amd64.deb \
   && echo "removing packages containing critical CVEs" &&\
-     apt remove -y zlib1g-dev libaom3 libxml2 libfcgi-bin libfcgi0ldbl \
+     apt remove -y zlib1g-dev libaom3 libxml2 libfcgi-bin libfcgi0ldbl libpython3.11-minimal \
   && apt clean
