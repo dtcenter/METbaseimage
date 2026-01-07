@@ -129,5 +129,5 @@ RUN \
      wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb &&\
      apt-get install -y ./google-chrome-stable_current_amd64.deb \
   && echo "Remove packages with CVEs" &&\
-     apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 &&\
+     apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 libpython3.11-minimal &&\
      apt clean
