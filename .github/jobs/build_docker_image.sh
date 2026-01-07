@@ -8,7 +8,8 @@ source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
 #   $DOCKERHUB_BASE_REPO is dtcenter/met-base(-dev).
 #   $DOCKERHUB_UNIT_TEST_REPO is dtcenter/met-base-unit-test(-dev).
 #   $DOCKERHUB_METVIEWER_REPO is dtcenter/met-base-metviewer(-dev).
-#   $DEBIAN_REPO is debian Docker repository name -- IronBank or DockerHub
+#   $DEBIAN_REGISTRY is debian Docker registry name -- IronBank or docker.io
+#   $DEBIAN_IMAGE is debian Docker image name -- IronBank or DockerHub
 #   $METPLUS_COMPONENT is component to build -- either met or metviewer
 
 if [ "$METPLUS_COMPONENT" == "met" ]; then
@@ -21,8 +22,9 @@ if [ "$METPLUS_COMPONENT" == "met" ]; then
     CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build_met_base_image.log
 
     if ! time_command docker build -t ${DOCKERHUB_TAG_BASE} \
-         --build-arg BASE_REPO=${DEBIAN_REPO} \
-         -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}; then
+             --build-arg BASE_REGISTRY=${DEBIAN_REGISTRY} \
+             --build-arg BASE_IMAGE=${DEBIAN_IMAGE} \
+             -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}; then
       echo "::group::${GITHUB_WORKSPACE}/docker_build_met_base_image.log"
       cat ${GITHUB_WORKSPACE}/docker_build_met_base_image.log
       echo "::endgroup::"
@@ -35,9 +37,9 @@ if [ "$METPLUS_COMPONENT" == "met" ]; then
     CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build_met_base_unit_test_env_image.log
 
     if ! time_command docker build -t ${DOCKERHUB_TAG_UNIT_TEST} \
-         --build-arg MET_BASE_REPO=${DOCKERHUB_BASE_REPO} \
-         --build-arg MET_BASE_TAG=${MET_BASE_TAG} \
-         -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}; then
+             --build-arg MET_BASE_REPO=${DOCKERHUB_BASE_REPO} \
+             --build-arg MET_BASE_TAG=${MET_BASE_TAG} \
+             -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}; then
       echo "::group::${GITHUB_WORKSPACE}/docker_build_met_unit_test_env_image.log"
       cat ${GITHUB_WORKSPACE}/docker_build_met_base_unit_test_env_image.log
       echo "::endgroup::"
@@ -59,8 +61,9 @@ DOCKERFILE_PATH=${GITHUB_WORKSPACE}/${GITHUB_NAME}/Dockerfile.metviewer
 CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build_met_base_metviewer_image.log
 
 if ! time_command docker build -t ${DOCKERHUB_TAG_METVIEWER} \
-     --build-arg BASE_REPO=${DEBIAN_REPO} \
-     -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}; then
+         --build-arg BASE_REGISTRY=${DEBIAN_REGISTRY} \
+         --build-arg BASE_IMAGE=${DEBIAN_IMAGE} \
+         -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}; then
   echo "::group::${GITHUB_WORKSPACE}/docker_build_met_base_metviewer_image.log"
   cat ${GITHUB_WORKSPACE}/docker_build_met_base_metviewer_image.log
   echo "::endgroup::"
