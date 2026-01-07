@@ -26,7 +26,8 @@ env:
   DOCKERHUB_BASE_REPO: dtcenter/met-base
   DOCKERHUB_UNIT_TEST_REPO: dtcenter/met-base-unit-test
   DOCKERHUB_METVIEWER_REPO: dtcenter/met-base-metviewer
-  DEBIAN_REPO: registry1.dso.mil/ironbank/opensource/debian/debian
+  DEBIAN_REGISTRY: registry1.dso.mil
+  DEBIAN_IMAGE: ironbank/opensource/debian/debian
 
 jobs:
 
