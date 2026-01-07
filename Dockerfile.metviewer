@@ -80,7 +80,7 @@ RUN \
   && echo "Create dummy python3 package to prevent installation of python3.11 with chrome" &&\
      ( \
         echo 'Package: python3-dummy'; \
-        echo 'Version: ${PYTHON_VER}'; \
+        echo "Version: ${PYTHON_VER}"; \
         echo 'Architecture: amd64'; \
         echo 'Maintainer: Dummy Pkg'; \
         echo 'Description: Dummy package to satisfy chrome dependency'; \
