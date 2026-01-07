@@ -79,15 +79,15 @@ RUN \
      ln -sf /usr/bin/pip3  /usr/bin/pip \
   && echo "Create dummy python3 package to prevent installation of python3.11 with chrome" &&\
      ( \
-        echo 'Package: python3-dummy'; \
+        echo 'Package: python3'; \
         echo "Version: ${PYTHON_VER}"; \
         echo 'Architecture: amd64'; \
         echo 'Maintainer: Dummy Pkg'; \
         echo 'Description: Dummy package to satisfy chrome dependency'; \
-        echo 'Provides: python3, python3.11, python3-minimal, python3.11-minimal, libpython3.11-minimal, libpython3.11-stdlib'; \
-     ) > /tmp/python3-dummy.control && \
-     equivs-build /tmp/python3-dummy.control &&\
-     dpkg -i python3-dummy_${PYTHON_VER}_amd64.deb \
+        echo 'Provides: python3, python3.11, python3-minimal, python3.11-minimal, libpython3.11-minimal, libpython3-stdlib, libpython3.11-stdlib'; \
+     ) > /tmp/python3.control && \
+     equivs-build /tmp/python3.control &&\
+     dpkg -i python3_${PYTHON_VER}_amd64.deb \
   && echo "Install GEOS - needed for cartopy" &&\
      wget http://download.osgeo.org/geos/geos-3.7.2.tar.bz2 && tar xjf geos-3.7.2.tar.bz2 &&\
      (cd geos-3.7.2 && ./configure && make clean && make && make install && ldconfig) &&\
