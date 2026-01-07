@@ -14,7 +14,7 @@ if [ -z ${DOCKER_USERNAME+x} ] || [ -z ${DOCKER_PASSWORD+x} ]; then
   exit 1
 fi
 
-if [ "$METPLUS_COMPONENT" != "met" && "$METPLUS_COMPONENT" != "metviewer" ]; then
+if [ "$METPLUS_COMPONENT" != "met" ] && [ "$METPLUS_COMPONENT" != "metviewer" ]; then
   echo "ERROR: Invalid value set for METPLUS_COMPONENT: ${METPLUS_COMPONENT}"
   exit 1
 fi
