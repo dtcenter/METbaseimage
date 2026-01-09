@@ -32,7 +32,7 @@ RUN \
      echo "Install system updates" &&\
      apt -y update && apt -y upgrade \
   && echo "Install required packages" &&\
-     apt -y install ant build-essential equivs git libffi-dev libssl-dev ksh \
+     apt -y install ant build-essential equivs ghostscript git libffi-dev libssl-dev ksh \
                     mariadb-server openjdk-17-jdk r-base wget &&\
      apt clean \
  && echo "Downloading and installing sqlite3 from ${SQLITE3_URL}" &&\
