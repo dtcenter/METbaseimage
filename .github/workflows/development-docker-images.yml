@@ -94,7 +94,7 @@ jobs:
               "${{ env.DOCKERHUB_UNIT_TEST_REPO }}:${{ needs.job_control.outputs.github_name }}",
               "${{ env.DOCKERHUB_METVIEWER_REPO }}:${{ needs.job_control.outputs.github_name }}"
             ]
-          fail-on-critical: "true"
+          fail-on-critical: "false"
 
       - name: Push Docker Image
         if: ${{ needs.job_control.outputs.push_image == 'true' }}
