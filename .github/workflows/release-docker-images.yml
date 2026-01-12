@@ -20,7 +20,7 @@ on:
         type: boolean
 
   schedule:
-    - cron: "16 18 * * 1"
+    - cron: "35 00 * * 0"
 
 env:
   DOCKERHUB_BASE_REPO: dtcenter/met-base
