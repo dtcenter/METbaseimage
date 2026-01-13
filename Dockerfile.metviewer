@@ -141,5 +141,5 @@ RUN \
      wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb &&\
      apt-get install -y ./google-chrome-stable_current_amd64.deb \
   && echo "removing packages containing critical CVEs" &&\
-     apt remove -y zlib1g-dev libaom3 libxml2 libfcgi-bin libfcgi0ldbl libpython3.11-minimal \
+     apt remove -y zlib1g-dev libaom3 libfcgi-bin libfcgi0ldbl libpython3.11-minimal \
   && apt clean
