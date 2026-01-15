@@ -26,6 +26,8 @@ env:
   DOCKERHUB_BASE_REPO: dtcenter/met-base
   DOCKERHUB_UNIT_TEST_REPO: dtcenter/met-base-unit-test
   DOCKERHUB_METVIEWER_REPO: dtcenter/met-base-metviewer
+  DEBIAN_REGISTRY: registry1.dso.mil
+  DEBIAN_IMAGE: ironbank/opensource/debian/debian
 
 jobs:
 
@@ -67,7 +69,7 @@ jobs:
               matrix+=\"${version}\",
             fi
           done
-          matrix+="]}"
+          matrix+="],\"component\": [\"met\", \"metviewer\"]}"
           echo "matrix=${matrix}" >> $GITHUB_OUTPUT
           echo "update_latest=${update_latest}" >> $GITHUB_OUTPUT
 
@@ -106,30 +108,14 @@ jobs:
       - name: Create directories to store build log output
         run: mkdir -p ${RUNNER_WORKSPACE}/logs
 
+      - name: Authenticate IronBank
+        run: echo "${{ secrets.IRONBANK_SECRET }}" | docker login -u ${{ secrets.IRONBANK_USERNAME }} --password-stdin registry1.dso.mil
+
       - name: Build Docker Image
         run: .github/jobs/build_docker_image.sh
         env:
           GITHUB_NAME: ${{ matrix.version }}
-
-      - name: Scan Docker Images
-        uses: dtcenter/metplus-action-scan-docker-images@v1
-        with:
-          images: |
-            [
-              "${{ steps.get-dockerhub-tags.outputs.base_repo_tag }}",
-              "${{ steps.get-dockerhub-tags.outputs.unit_test_repo_tag }}",
-              "${{ steps.get-dockerhub-tags.outputs.metviewer_repo_tag }}"
-            ]
-          fail-on-critical: "true"
-          log-artifact-name: "security-scan-logs_${{ matrix.version }}"
-
-      - name: Push Docker Image
-        run: .github/jobs/push_docker_image.sh
-        env:
-          GITHUB_NAME: ${{ matrix.version }}
-          UPDATE_LATEST: ${{ fromJSON(needs.define-matrix.outputs.update_latest) }}
-          DOCKER_USERNAME: 'dtcenter'
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
+          METPLUS_COMPONENT: ${{ matrix.component }}
 
       - name: Copy build log files into logs directory
         if: always()
@@ -139,6 +125,27 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: build_logs_${{ matrix.version }}
+          name: build_logs_${{ matrix.component }}_${{ matrix.version }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
+
+      # scan base_repo_tag and unit_test_repo_tag if component is met
+      # scan metviewer_repo_tag if component is metviewer
+      - name: Scan Docker Images
+        uses: dtcenter/metplus-action-scan-docker-images@v1
+        with:
+          images: |
+            [
+              ${{ matrix.component == 'met' && format('"{0}", "{1}"', steps.get-dockerhub-tags.outputs.base_repo_tag, steps.get-dockerhub-tags.outputs.unit_test_repo_tag) || format('"{0}"', steps.get-dockerhub-tags.outputs.metviewer_repo_tag) }}
+            ]
+          fail-on-critical: "false"
+          log-artifact-name: "security-scan-logs_${{ matrix.component }}_${{ matrix.version }}"
+
+      - name: Push Docker Image
+        run: .github/jobs/push_docker_image.sh
+        env:
+          GITHUB_NAME: ${{ matrix.version }}
+          METPLUS_COMPONENT: ${{ matrix.component }}
+          UPDATE_LATEST: ${{ fromJSON(needs.define-matrix.outputs.update_latest) }}
+          DOCKER_USERNAME: 'dtcenter'
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
