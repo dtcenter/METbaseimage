@@ -1,5 +1,8 @@
-ARG DEBIAN_VERSION=12
-FROM debian:${DEBIAN_VERSION}-slim
+ARG BASE_REGISTRY=docker.io
+ARG BASE_IMAGE=debian
+ARG BASE_TAG=12-slim
+FROM ${BASE_REGISTRY}/${BASE_IMAGE}:${BASE_TAG}
+
 LABEL maintainer="George McCabe <mccabe@ucar.edu>"
 
 ARG MET_COMPILE_SCRIPT_BRANCH=develop

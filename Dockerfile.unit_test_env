@@ -9,7 +9,15 @@ WORKDIR /met
 
 ENV NCO_URL=https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/nco-5.3.3.tar.gz
 
-# install Perl XML parser, R (with ncdf4) and NC tools
+# - install Perl XML parser, R (with ncdf4) and NC tools
+# - CVE-2024-32608
+#    Install nco 5.3.3 from source to avoid CVEs in HDF5 1.10.8 packages
+# - Remove packages containing Critical CVEs:
+#    NAME              INSTALLED               FIXED IN    TYPE VULNERABILITY  SEVERITY EPSS % RISK
+#    zlib1g-dev        1:1.2.13.dfsg-1         (won't fix) deb  CVE-2023-45853 Critical 70.89  0.6
+#    libxml2           2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49794 Critical 23.45  < 0.1
+#    libxml2           2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49796 Critical 18.40  < 0.1
+#
 
 RUN echo "Installing tools needed for running MET unit tests..." \
  && echo "Installing Perl XML Parser..." \
@@ -21,26 +29,14 @@ RUN echo "Installing tools needed for running MET unit tests..." \
  && wget https://cran.r-project.org/src/contrib/Archive/ncdf4/ncdf4_1.21.tar.gz \
  && R CMD INSTALL --configure-args="--with-nc-config=/usr/local/netcdf/netcdf-c-4.7.4/nc-config" ncdf4_1.21.tar.gz \
  && echo "Installing udunits..." \
- && apt install -y libudunits2-dev
-
-#
-# CVE-2024-32608
-#   Install nco 5.3.3 from source to avoid CVEs in HDF5 1.10.8 packages
-#
-RUN echo "Dowloading nco from ${NCO_URL}" \
+ && apt install -y libudunits2-dev &&\
+    echo "Downloading nco from ${NCO_URL}" \
  && wget ${NCO_URL} \
  && tar xzf nco-5.3.3.tar.gz \
  && cd nco-5.3.3 \
  && ./configure --enable-shared LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" \
  && make -j `nproc` \
  && make install \
- && echo "Finished installing unit test tools"
-
-#
-# Remove packages containing Critical CVEs:
-#   NAME              INSTALLED               FIXED IN    TYPE VULNERABILITY  SEVERITY EPSS % RISK
-#   zlib1g-dev        1:1.2.13.dfsg-1         (won't fix) deb  CVE-2023-45853 Critical 70.89  0.6
-#   libxml2           2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49794 Critical 23.45  < 0.1
-#   libxml2           2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49796 Critical 18.40  < 0.1
-#
-RUN apt remove -y zlib1g-dev libxml2
+ && echo "Finished installing unit test tools" &&\
+    echo "Removing packages containing CVEs" \
+ && apt remove -y zlib1g-dev libxml2

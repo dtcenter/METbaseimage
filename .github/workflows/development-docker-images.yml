@@ -31,6 +31,8 @@ env:
   DOCKERHUB_BASE_REPO: dtcenter/met-base-dev
   DOCKERHUB_UNIT_TEST_REPO: dtcenter/met-base-unit-test-dev
   DOCKERHUB_METVIEWER_REPO: dtcenter/met-base-metviewer-dev
+  DEBIAN_REGISTRY: registry1.dso.mil
+  DEBIAN_IMAGE: ironbank/opensource/debian/debian
 
 jobs:
 
@@ -63,6 +65,10 @@ jobs:
     name: Build, Scan, and Push Images
     runs-on: ubuntu-latest
     needs: job_control
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [met, metviewer]
 
     steps:
       - uses: actions/checkout@v4
@@ -78,31 +84,14 @@ jobs:
       - name: Create directories to store build log output
         run: mkdir -p ${RUNNER_WORKSPACE}/logs
 
+      - name: Authenticate IronBank
+        run: echo "${{ secrets.IRONBANK_SECRET }}" | docker login -u ${{ secrets.IRONBANK_USERNAME }} --password-stdin registry1.dso.mil
+
       - name: Build Docker Image
         run: .github/jobs/build_docker_image.sh
         env:
           GITHUB_NAME: ${{ needs.job_control.outputs.github_name }}
-
-      - name: Scan Docker Images
-        id: scan
-        continue-on-error: true
-        uses: dtcenter/metplus-action-scan-docker-images@v1
-        with:
-          images: |
-            [
-              "${{ env.DOCKERHUB_BASE_REPO }}:${{ needs.job_control.outputs.github_name }}",
-              "${{ env.DOCKERHUB_UNIT_TEST_REPO }}:${{ needs.job_control.outputs.github_name }}",
-              "${{ env.DOCKERHUB_METVIEWER_REPO }}:${{ needs.job_control.outputs.github_name }}"
-            ]
-          fail-on-critical: "false"
-
-      - name: Push Docker Image
-        if: ${{ needs.job_control.outputs.push_image == 'true' }}
-        run: .github/jobs/push_docker_image.sh
-        env:
-          GITHUB_NAME: ${{ needs.job_control.outputs.github_name }}
-          DOCKER_USERNAME: 'dtcenter'
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
+          METPLUS_COMPONENT: ${{ matrix.component }}
 
       - name: Copy build log files into logs directory
         if: always()
@@ -112,11 +101,29 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: build_logs
+          name: build_logs_${{ matrix.component }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
-      - name: Check scan status
-        run: |
-          echo "Scan status: ${{ steps.scan.outputs.scan-status }}"
-          exit ${{ steps.scan.outputs.scan-status }}
+      # scan DOCKERHUB_BASE_REPO and DOCKERHUB_UNIT_TEST_REPO if component is met
+      # scan DOCKERHUB_METVIEWER_REPO if component is metviewer
+      - name: Scan Docker Images
+        id: scan
+        continue-on-error: true
+        uses: dtcenter/metplus-action-scan-docker-images@v1
+        with:
+          images: |
+            [
+              ${{ matrix.component == 'met' && format('"{0}:{2}", "{1}:{2}"', env.DOCKERHUB_BASE_REPO, env.DOCKERHUB_UNIT_TEST_REPO, needs.job_control.outputs.github_name) || format('"{0}:{1}"', env.DOCKERHUB_METVIEWER_REPO, needs.job_control.outputs.github_name) }}
+            ]
+          fail-on-critical: "false"
+          log-artifact-name: "security-scan-logs_${{ matrix.component }}"
+
+      - name: Push Docker Image
+        if: ${{ needs.job_control.outputs.push_image == 'true' }}
+        run: .github/jobs/push_docker_image.sh
+        env:
+          GITHUB_NAME: ${{ needs.job_control.outputs.github_name }}
+          METPLUS_COMPONENT: ${{ matrix.component }}
+          DOCKER_USERNAME: 'dtcenter'
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
