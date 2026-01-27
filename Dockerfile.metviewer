@@ -113,7 +113,7 @@ RUN \
       numpy \
       opencv-python \
       packaging \
-      pandas \
+      "pandas>=2.3.3,<3" \
       pint \
       plotly \
       pluggy \
