@@ -19,17 +19,14 @@ ENV CXX=/usr/bin/g++
 ENV FC=/usr/bin/gfortran
 ENV F77=/usr/bin/gfortran
 
-ENV GSFONT_URL=https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/ghostscript-fonts-std-8.11.tar.gz
 ENV ZLIB_URL=https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/zlib-1.3.1.tar.gz
 ENV SQLITE3_URL=https://www.sqlite.org/2025/sqlite-autoconf-3500300.tar.gz
-ENV MET_FONT_DIR=/usr/local/share/met/fonts
 
 WORKDIR /met
 
 RUN \
     echo "Set up the environment for interactive bash shell" &&\
     echo export MET_BASE=/usr/local/share/met >> /root/.bashrc &&\
-    echo export MET_FONT_DIR=/usr/local/share/met/fonts >> /root/.bashrc &&\
     echo export RSCRIPTS_BASE=/usr/local/share/met/Rscripts >> /root/.bashrc \
  && echo "Set soft limit to unlimited to prevent GRIB2 seg faults" &&\
     echo ulimit -S -s unlimited >> /root/.bashrc \
@@ -65,9 +62,6 @@ RUN \
     ) > /tmp/libsqlite3-0.control && \
     equivs-build /tmp/libsqlite3-0.control &&\
     dpkg -i libsqlite3-0_9.9.9_amd64.deb \
- && echo "Downloading GhostScript fonts from ${GSFONT_URL} into /usr/local/share/met" &&\
-    mkdir -p /usr/local/share/met &&\
-    curl -SL ${GSFONT_URL} | tar zxC /usr/local/share/met \
  && echo "Install Python from source" &&\
     wget https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tgz &&\
     tar xzf Python-${PYTHON_VER}.tgz &&\
