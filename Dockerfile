@@ -11,8 +11,10 @@ ARG MET_TAR_FILE_VERSION_NAME=met-base-develop
 #
 # CVE-2025-4517
 #   Switch from Python 3.12.0 to 3.12.11
+# CVE-2025-13836
+#   Switch to Python 3.14.3
 #
-ENV PYTHON_VER=3.12.11
+ENV PYTHON_VER=3.14.3
 
 ENV CC=/usr/bin/gcc
 ENV CXX=/usr/bin/g++
@@ -134,9 +136,3 @@ RUN apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 \
     sed -i 's/policy domain="coder" rights="none" pattern="EPS"/policy domain="coder" rights="read | write" pattern="EPS"/g' /usr/local/etc/ImageMagick-7/policy.xml &&\
     sed -i 's/policy domain="coder" rights="none" pattern="PDF"/policy domain="coder" rights="read | write" pattern="PDF"/g' /usr/local/etc/ImageMagick-7/policy.xml &&\
     sed -i 's/policy domain="coder" rights="none" pattern="XPS"/policy domain="coder" rights="read | write" pattern="XPS"/g' /usr/local/etc/ImageMagick-7/policy.xml \
- && echo "Install Chrome dependencies that are not found in slim OS - needed by plotly/kaleido for METplotpy" &&\
-    apt install -y libasound2 libatk-bridge2.0-0 libcairo2 libcups2 libgbm1 libnss3 libpango-1.0-0 \
-                   libxcomposite1 libxdamage1 libxfixes3 libxkbcommon0 libxrandr2 \
- && echo "Remove libxml2 again because it was added again from chrome dependencies" &&\
-    apt remove -y libxml2 &&\
-    apt clean
