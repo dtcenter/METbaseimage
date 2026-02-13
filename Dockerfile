@@ -92,11 +92,11 @@ RUN \
      export LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" &&\
      python3 -m pip install --upgrade pip &&\
      python3 -m pip install --no-binary :all: \
-       netCDF4 \
-       numpy \
-       pyyaml \
-       scipy \
-       xarray \
+       netCDF4==1.7.4 \
+       numpy==2.4.2 \
+       pyyaml==6.0.3 \
+       scipy==1.17.0 \
+       xarray==2026.1.0 \
     ) \
  && echo "Running linker configuration" &&\
     ldconfig
