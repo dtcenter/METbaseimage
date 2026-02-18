@@ -21,7 +21,7 @@ ENV SQLITE3_URL=https://www.sqlite.org/2025/sqlite-autoconf-3500300.tar.gz
 # Expose METviewer port
 EXPOSE 8080
 
-ENV PYTHON_VER=3.12.12
+ENV PYTHON_VER=3.14.3
 
 WORKDIR /tmp
 
@@ -113,7 +113,7 @@ RUN \
       numpy \
       opencv-python \
       packaging \
-      "pandas>=2.3.3,<3" \
+      pandas \
       pint \
       plotly \
       pluggy \

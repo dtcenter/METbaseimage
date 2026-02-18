@@ -8,11 +8,7 @@ LABEL maintainer="George McCabe <mccabe@ucar.edu>"
 ARG MET_COMPILE_SCRIPT_BRANCH=develop
 ARG MET_TAR_FILE_VERSION_NAME=met-base-develop
 
-#
-# CVE-2025-4517
-#   Switch from Python 3.12.0 to 3.12.11
-#
-ENV PYTHON_VER=3.12.11
+ENV PYTHON_VER=3.14.3
 
 ENV CC=/usr/bin/gcc
 ENV CXX=/usr/bin/g++
@@ -92,7 +88,13 @@ RUN \
      export CPPFLAGS="-I/usr/local/include" &&\
      export LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" &&\
      python3 -m pip install --upgrade pip &&\
-     python3 -m pip install --no-binary :all: netCDF4==1.7.2 numpy==2.2.2 pyyaml==6.0.2 scipy==1.15.1 xarray==2025.1.2) \
+     python3 -m pip install --no-binary :all: \
+       netCDF4~=1.7.4 \
+       numpy~=2.3.2 \
+       pyyaml~=6.0.2 \
+       scipy~=1.15.1 \
+       xarray~=2025.1.2 \
+    ) \
  && echo "Running linker configuration" &&\
     ldconfig
 
