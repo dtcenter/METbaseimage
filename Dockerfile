@@ -10,6 +10,9 @@ ARG MET_TAR_FILE_VERSION_NAME=met-base-develop
 
 ENV PYTHON_VER=3.14.3
 
+ENV MET_PYTHON_CC="-I${MET_PYTHON}/include/python3.14"
+ENV MET_PYTHON_LD="-L${MET_PYTHON}/lib -lpython3.14 -ldl -lm"
+
 ENV CC=/usr/bin/gcc
 ENV CXX=/usr/bin/g++
 ENV FC=/usr/bin/gfortran
@@ -90,10 +93,10 @@ RUN \
      python3 -m pip install --upgrade pip &&\
      python3 -m pip install --no-binary :all: \
        netCDF4~=1.7.4 \
-       numpy~=2.3.2 \
-       pyyaml~=6.0.2 \
-       scipy~=1.15.1 \
-       xarray~=2025.1.2 \
+       numpy~=2.4.2 \
+       pyyaml~=6.0.3 \
+       scipy~=1.17.0 \
+       xarray~=2026.1.0 \
     ) \
  && echo "Running linker configuration" &&\
     ldconfig
