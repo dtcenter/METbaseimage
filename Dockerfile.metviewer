@@ -11,7 +11,7 @@ LABEL maintainer="John Halley Gotway <johnhg@ucar.edu>"
 #   https://archive.apache.org/dist/tomcat/tomcat-${TOMCAT_MAJOR_VERSION}/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz
 #
 ENV TOMCAT_MAJOR_VERSION=9
-ENV TOMCAT_MINOR_VERSION=0.109
+ENV TOMCAT_MINOR_VERSION=0.115
 ENV TOMCAT_VERSION=${TOMCAT_MAJOR_VERSION}.${TOMCAT_MINOR_VERSION}
 ENV TOMCAT_URL=https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/apache-tomcat-${TOMCAT_VERSION}.tar.gz
 ENV CATALINA_HOME=/opt/tomcat
