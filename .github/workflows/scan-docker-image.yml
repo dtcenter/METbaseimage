@@ -17,13 +17,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Pull Docker Image
         run: docker pull ${{ inputs.image_name }}
 
       - name: Scan Docker Images
-        uses: dtcenter/metplus-action-scan-docker-images@v1
+        uses: dtcenter/metplus-action-scan-docker-images@v2
         with:
           images: |
             [

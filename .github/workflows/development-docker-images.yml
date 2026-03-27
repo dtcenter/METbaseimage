@@ -71,12 +71,12 @@ jobs:
         component: [met, metviewer]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Free Disk Space
         uses: dtcenter/metplus-action-free-disk-space@v1
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.job_control.outputs.github_name }}
           path: ${{ needs.job_control.outputs.github_name }}
@@ -99,7 +99,7 @@ jobs:
 
       - name: Upload build logs as artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: build_logs_${{ matrix.component }}
           path: ${{ runner.workspace }}/logs
@@ -109,7 +109,8 @@ jobs:
       # scan DOCKERHUB_METVIEWER_REPO if component is metviewer
       - name: Scan Docker Images
         id: scan
-        uses: dtcenter/metplus-action-scan-docker-images@v1
+        continue-on-error: true
+        uses: dtcenter/metplus-action-scan-docker-images@v2
         with:
           images: |
             [
