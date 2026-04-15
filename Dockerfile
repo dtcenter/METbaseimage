@@ -12,7 +12,7 @@ ENV PYTHON_VER=3.14.3
 
 # set env vars needed to install MET with Python Embedding support
 ENV MET_PYTHON_BIN_EXE=/usr/local/bin/python3
-ENV MET_PYTHON_CC="-I$/usr/local/include/python3.14"
+ENV MET_PYTHON_CC="-I/usr/local/include/python3.14"
 ENV MET_PYTHON_LD="-L/usr/local/lib -lpython3.14 -ldl -lm"
 
 ENV CC=/usr/bin/gcc
