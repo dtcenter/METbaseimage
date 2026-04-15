@@ -11,7 +11,7 @@ ARG MET_TAR_FILE_VERSION_NAME=met-base-v3.4
 # CVE-2025-4517
 #   Switch from Python 3.12.0 to 3.12.11
 #
-ENV PYTHON_VER=3.14.3
+ENV PYTHON_VER=3.14.4
 
 # set env vars needed to install MET with Python Embedding support
 
