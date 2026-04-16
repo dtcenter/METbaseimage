@@ -96,8 +96,10 @@ RUN \
      export NETCDF4_DIR=/usr/local/ &&\
      export CPPFLAGS="-I/usr/local/include" &&\
      export LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" &&\
+     echo "meson<1.11.0" > build-constraint.txt &&\
      python3 -m pip install --upgrade pip &&\
-     python3 -m pip install --no-binary :all: meson==1.10.2 numpy==2.3.2 xarray==2025.1.2 netCDF4==1.7.2 "pandas>=2.3.3,<3" pyyaml==6.0.2 scipy==1.15.1) \
+     python3 -m pip install -c build-constraint.txt --no-binary :all: \
+       numpy==2.3.2 xarray==2025.1.2 netCDF4==1.7.2 "pandas>=2.3.3,<3" pyyaml==6.0.2 scipy==1.15.1) \
  && echo "Running linker configuration" &&\
     ldconfig
 
