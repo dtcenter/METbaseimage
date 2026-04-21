@@ -7,11 +7,7 @@ LABEL maintainer="George McCabe <mccabe@ucar.edu>"
 ARG MET_COMPILE_SCRIPT_BRANCH=main_v12.1
 ARG MET_TAR_FILE_VERSION_NAME=met-base-v3.4
 
-#
-# CVE-2025-4517
-#   Switch from Python 3.12.0 to 3.12.11
-#
-ENV PYTHON_VER=3.14.4
+ENV PYTHON_VER=3.13.9
 
 # set env vars needed to install MET with Python Embedding support
 
@@ -96,9 +92,8 @@ RUN \
      export NETCDF4_DIR=/usr/local/ &&\
      export CPPFLAGS="-I/usr/local/include" &&\
      export LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" &&\
-     echo "meson<1.11.0" > build-constraint.txt &&\
      python3 -m pip install --upgrade pip &&\
-     python3 -m pip install -c build-constraint.txt --no-binary :all: \
+     python3 -m pip install --no-binary :all: \
        numpy==2.3.2 xarray==2025.1.2 netCDF4==1.7.2 "pandas>=2.3.3,<3" pyyaml==6.0.2 scipy==1.15.1) \
  && echo "Running linker configuration" &&\
     ldconfig
