@@ -21,7 +21,7 @@ ENV SQLITE3_URL=https://www.sqlite.org/2025/sqlite-autoconf-3500300.tar.gz
 # Expose METviewer port
 EXPOSE 8080
 
-ENV PYTHON_VER=3.14.3
+ENV PYTHON_VER=3.14.4
 
 WORKDIR /tmp
 
@@ -106,7 +106,6 @@ RUN \
       imageio \
       imutils \
       iniconfig \
-      kaleido \
       lxml \
       matplotlib \
       metpy \
@@ -116,7 +115,6 @@ RUN \
       packaging \
       pandas \
       pint \
-      plotly \
       pluggy \
       pytest \
       python-dateutil \
@@ -129,10 +127,4 @@ RUN \
       six \
       tomli \
       wheel \
-      xarray \
-  && echo "Install chrome for plotly/kaleido" &&\
-     wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb &&\
-     apt-get install -y ./google-chrome-stable_current_amd64.deb \
-  && echo "Remove packages with CVEs" &&\
-     apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libarchive13 libpython3.11-minimal &&\
-     apt clean
+      xarray

@@ -8,7 +8,7 @@ LABEL maintainer="George McCabe <mccabe@ucar.edu>"
 ARG MET_COMPILE_SCRIPT_BRANCH=develop
 ARG MET_TAR_FILE_VERSION_NAME=met-base-develop
 
-ENV PYTHON_VER=3.14.3
+ENV PYTHON_VER=3.14.4
 
 # set env vars needed to install MET with Python Embedding support
 ENV MET_PYTHON_BIN_EXE=/usr/local/bin/python3
@@ -141,10 +141,4 @@ RUN \
     --enable-static &&\
     make -j $(nproc) &&\
     make install &&\
-    ldconfig) \
- && echo "Install Chrome dependencies that are not found in slim OS - needed by plotly/kaleido for METplotpy" &&\
-    apt install -y libasound2 libatk-bridge2.0-0 libcairo2 libcups2 libgbm1 libnss3 libpango-1.0-0 \
-                   libxcomposite1 libxdamage1 libxfixes3 libxkbcommon0 libxrandr2 \
- && echo "Remove libxml2 again because it was added again from chrome dependencies" &&\
-    apt remove -y libxml2 &&\
-    apt clean
+    ldconfig)
