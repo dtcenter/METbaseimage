@@ -7,17 +7,13 @@ LABEL maintainer="George McCabe <mccabe@ucar.edu>"
 ARG MET_COMPILE_SCRIPT_BRANCH=main_v12.1
 ARG MET_TAR_FILE_VERSION_NAME=met-base-v3.4
 
-#
-# CVE-2025-4517
-#   Switch from Python 3.12.0 to 3.12.11
-#
-ENV PYTHON_VER=3.14.3
+ENV PYTHON_VER=3.12.13
 
 # set env vars needed to install MET with Python Embedding support
 
 ENV MET_PYTHON_BIN_EXE=/usr/local/bin/python3
-ENV MET_PYTHON_CC="-I/usr/local/include/python3.14"
-ENV MET_PYTHON_LD="-L/usr/local/lib -lpython3.14 -ldl -lm"
+ENV MET_PYTHON_CC="-I/usr/local/include/python3.12"
+ENV MET_PYTHON_LD="-L/usr/local/lib -lpython3.12 -ldl -lm"
 
 ENV CC=/usr/bin/gcc
 ENV CXX=/usr/bin/g++
