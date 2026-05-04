@@ -8,6 +8,17 @@ Please see the [MET website](https://dtcenter.org/community-code/model-evaluatio
 Version History
 ===============
 
+v3.5.3
+------
+
+* Force pandas version to <3
+
+v3.5.2
+------
+
+* Separate MET and METviewer images
+* Use IronBank debian as base repository
+
 v3.5.1
 ------
 
@@ -17,6 +28,24 @@ v3.5.0
 ------
 
 * Upgrade to Tomcat 10.1.48
+
+v3.4.9
+------
+
+* Upgrade Python to 3.14.3
+* Upgrade Tomcat to 9.0.115
+
+v3.4.8
+------
+
+* Force pandas version to <3
+
+v3.4.7
+------
+
+* Separate MET and METviewer images
+* Use IronBank debian as base repository
+
 
 v3.4.6
 ------

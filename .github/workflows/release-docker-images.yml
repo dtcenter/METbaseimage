@@ -9,8 +9,8 @@ on:
   workflow_dispatch:
     inputs:
       release_version:
-        description: 'Comma-separated list of versions to build, e.g. v3.3,v3.4,v3.5'
-        default: 'v3.3,v3.4,v3.5'
+        description: 'Comma-separated list of versions to build, e.g. v3.4,v3.5'
+        default: 'v3.4,v3.5'
         required: true
         type: string
       update_latest:
@@ -20,7 +20,7 @@ on:
         type: boolean
 
   schedule:
-    - cron: "30 00 * * 0"
+    - cron: "35 00 * * 0"
 
 env:
   DOCKERHUB_BASE_REPO: dtcenter/met-base
@@ -51,7 +51,7 @@ jobs:
         id: get-versions
         run: |
           if [[ ${{ github.event_name }} == 'schedule' ]]; then
-            version_string="v3.3,v3.4,v3.5"
+            version_string="v3.4,v3.5"
             update_latest="true"
           elif [[ ${{ github.event_name }} == 'workflow_dispatch' ]]; then
             version_string=${{ toJSON(inputs.release_version) }}
