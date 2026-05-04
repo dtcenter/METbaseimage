@@ -8,6 +8,11 @@ Please see the [MET website](https://dtcenter.org/community-code/model-evaluatio
 Version History
 ===============
 
+v3.5.4
+------
+
+* Upgrade Python to 3.14.4
+
 v3.5.3
 ------
 
