@@ -8,11 +8,12 @@ LABEL maintainer="George McCabe <mccabe@ucar.edu>"
 ARG MET_COMPILE_SCRIPT_BRANCH=develop
 ARG MET_TAR_FILE_VERSION_NAME=met-base-develop
 
-#
-# CVE-2025-4517
-#   Switch from Python 3.12.0 to 3.12.11
-#
-ENV PYTHON_VER=3.12.11
+ENV PYTHON_VER=3.14.4
+
+# set env vars needed to install MET with Python Embedding support
+ENV MET_PYTHON_BIN_EXE=/usr/local/bin/python3
+ENV MET_PYTHON_CC="-I/usr/local/include/python3.14"
+ENV MET_PYTHON_LD="-L/usr/local/lib -lpython3.14 -ldl -lm"
 
 ENV CC=/usr/bin/gcc
 ENV CXX=/usr/bin/g++
@@ -25,6 +26,20 @@ ENV SQLITE3_URL=https://www.sqlite.org/2025/sqlite-autoconf-3500300.tar.gz
 ENV MET_FONT_DIR=/usr/local/share/met/fonts
 
 WORKDIR /met
+
+#
+# - Remove packages containing Critical CVEs:
+#   NAME              INSTALLED               FIXED IN    TYPE VULNERABILITY  SEVERITY EPSS % RISK
+#   zlib1g-dev        1:1.2.13.dfsg-1         (won't fix) deb  CVE-2023-45853 Critical 70.89  0.6
+#   libopenexr-3-1-30 3.1.5-5                 (won't fix) deb  CVE-2023-5841  Critical 70.03  0.6
+#   libaom3           3.6.0-1+deb12u1         (won't fix) deb  CVE-2023-6879  Critical 37.08  0.1
+#   libxml2           2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49794 Critical 23.45  < 0.1
+#   libxml2           2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49796 Critical 18.40  < 0.1
+#   libarchive13      3.6.2-1+deb12u2         (won't fix) deb  CVE-2025-5914  Critical 10.77  < 0.1
+#
+# - Install imagemagick after removal because it was removed as a dependency.
+#   Must install from source with some features like xml excluded because version from apt re-installs problematic
+#   packages that contain critical CVEs.
 
 RUN \
     echo "Set up the environment for interactive bash shell" &&\
@@ -72,7 +87,8 @@ RUN \
     wget https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tgz &&\
     tar xzf Python-${PYTHON_VER}.tgz &&\
     (cd Python-${PYTHON_VER} &&\
-    ./configure --enable-optimizations --enable-shared --disable-test-modules LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" &&\
+    ./configure --enable-optimizations --enable-shared --disable-test-modules \
+      LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" &&\
     make -j `nproc` &&\
     make install) &&\
     ln -s /usr/local/bin/python3 /usr/local/bin/python &&\
@@ -92,25 +108,17 @@ RUN \
      export CPPFLAGS="-I/usr/local/include" &&\
      export LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" &&\
      python3 -m pip install --upgrade pip &&\
-     python3 -m pip install --no-binary :all: netCDF4==1.7.2 numpy==2.2.2 pyyaml==6.0.2 scipy==1.15.1 xarray==2025.1.2) \
+     python3 -m pip install --no-binary :all: \
+       netCDF4~=1.7.4 \
+       numpy~=2.4.2 \
+       pyyaml~=6.0.3 \
+       scipy~=1.17.0 \
+       xarray~=2026.1.0 \
+    ) \
  && echo "Running linker configuration" &&\
-    ldconfig
-
-#
-# - Remove packages containing Critical CVEs:
-#   NAME              INSTALLED               FIXED IN    TYPE VULNERABILITY  SEVERITY EPSS % RISK
-#   zlib1g-dev        1:1.2.13.dfsg-1         (won't fix) deb  CVE-2023-45853 Critical 70.89  0.6
-#   libopenexr-3-1-30 3.1.5-5                 (won't fix) deb  CVE-2023-5841  Critical 70.03  0.6
-#   libaom3           3.6.0-1+deb12u1         (won't fix) deb  CVE-2023-6879  Critical 37.08  0.1
-#   libxml2           2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49794 Critical 23.45  < 0.1
-#   libxml2           2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49796 Critical 18.40  < 0.1
-#   libarchive13      3.6.2-1+deb12u2         (won't fix) deb  CVE-2025-5914  Critical 10.77  < 0.1
-#
-# - Install imagemagick after removal because it was removed as a dependency.
-#   Must install from source with some features like xml excluded because version from apt re-installs problematic
-#   packages that contain critical CVEs.
-#
-RUN apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 \
+    ldconfig \
+ && echo "Remove packages with CVEs" &&\
+    apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 \
  && echo "Building ImageMagick without XML support" &&\
     wget https://github.com/ImageMagick/ImageMagick/archive/refs/tags/7.1.2-0.tar.gz &&\
     tar xzf 7.1.2-0.tar.gz &&\
@@ -133,16 +141,4 @@ RUN apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 \
     --enable-static &&\
     make -j $(nproc) &&\
     make install &&\
-    ldconfig) \
- && echo "Fix rules for ghostscript files in convert" &&\
-    echo "See: https://en.linuxportal.info/tutorials/troubleshooting/how-to-fix-errors-from-imagemagick-imagick-conversion-system-security-policy" &&\
-    sed -i 's/policy domain="coder" rights="none" pattern="PS/policy domain="coder" rights="read | write" pattern="PS/g' /usr/local/etc/ImageMagick-7/policy.xml &&\
-    sed -i 's/policy domain="coder" rights="none" pattern="EPS"/policy domain="coder" rights="read | write" pattern="EPS"/g' /usr/local/etc/ImageMagick-7/policy.xml &&\
-    sed -i 's/policy domain="coder" rights="none" pattern="PDF"/policy domain="coder" rights="read | write" pattern="PDF"/g' /usr/local/etc/ImageMagick-7/policy.xml &&\
-    sed -i 's/policy domain="coder" rights="none" pattern="XPS"/policy domain="coder" rights="read | write" pattern="XPS"/g' /usr/local/etc/ImageMagick-7/policy.xml \
- && echo "Install Chrome dependencies that are not found in slim OS - needed by plotly/kaleido for METplotpy" &&\
-    apt install -y libasound2 libatk-bridge2.0-0 libcairo2 libcups2 libgbm1 libnss3 libpango-1.0-0 \
-                   libxcomposite1 libxdamage1 libxfixes3 libxkbcommon0 libxrandr2 \
- && echo "Remove libxml2 again because it was added again from chrome dependencies" &&\
-    apt remove -y libxml2 &&\
-    apt clean
+    ldconfig)
