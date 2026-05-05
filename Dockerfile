@@ -93,7 +93,8 @@ RUN \
      export CPPFLAGS="-I/usr/local/include" &&\
      export LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" &&\
      python3 -m pip install --upgrade pip &&\
-     python3 -m pip install "meson<1.11.0" "meson-python" "ninja" "cython>=3.0" "wheel" "setuptools" &&\
+     python3 -m pip install "meson<1.11.0" "meson-python" "ninja" "cython>=3.0" "wheel" \
+                            "setuptools" "setuptools-scm" "hatchling" &&\
      python3 -m pip install --no-binary :all: --no-build-isolation \
        numpy==2.3.2 \
        xarray==2025.1.2 \
