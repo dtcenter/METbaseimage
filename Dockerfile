@@ -96,7 +96,8 @@ RUN \
      python3 -m pip install "meson<1.11.0" "meson-python" "ninja" "cython>=3.0" "wheel" \
                             "setuptools" "setuptools-scm" "hatchling" &&\
      python3 -m pip install --no-binary :all: --no-build-isolation \
-       numpy==2.3.2 \
+       numpy==2.3.2 cftime &&\
+     python3 -m pip install --no-binary :all: --no-build-isolation \
        xarray==2025.1.2 \
        netCDF4==1.7.2 \
        "pandas>=2.3.3,<3" \
