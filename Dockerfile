@@ -93,7 +93,15 @@ RUN \
      export CPPFLAGS="-I/usr/local/include" &&\
      export LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" &&\
      python3 -m pip install --upgrade pip &&\
-     python3 -m pip install --no-binary :all: numpy==2.3.2 xarray==2025.1.2 netCDF4==1.7.2 "pandas>=2.3.3,<3" pyyaml==6.0.2 scipy==1.15.1) \
+     python3 -m pip install "meson<1.11.0" "meson-python" "wheel" "setuptools" &&\
+     python3 -m pip install --no-binary :all: --no-build-isolation \
+       numpy==2.3.2 \
+       xarray==2025.1.2 \
+       netCDF4==1.7.2 \
+       "pandas>=2.3.3,<3" \
+       pyyaml==6.0.2 \
+       scipy==1.15.1 \
+    ) \
  && echo "Running linker configuration" &&\
     ldconfig
 
