@@ -93,8 +93,11 @@ RUN \
      export CPPFLAGS="-I/usr/local/include" &&\
      export LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" &&\
      python3 -m pip install --upgrade pip &&\
+     echo "install packages needed to build packages with no build isolation" &&\
      python3 -m pip install "meson<1.11.0" "meson-python" "ninja" "cython>=3.0" "wheel" \
-                            "setuptools" "setuptools-scm" "hatchling" &&\
+                            "setuptools" "setuptools-scm" "hatchling" \
+                            "versioneer[toml]" "pythran" "pybind11" &&\
+     echo "install numpy first since it is needed to install other packages" &&\
      python3 -m pip install --no-binary :all: --no-build-isolation \
        numpy==2.3.2 &&\
      python3 -m pip install --no-binary :all: --no-build-isolation \
