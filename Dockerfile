@@ -7,11 +7,7 @@ LABEL maintainer="George McCabe <mccabe@ucar.edu>"
 ARG MET_COMPILE_SCRIPT_BRANCH=main_v12.1
 ARG MET_TAR_FILE_VERSION_NAME=met-base-v3.4
 
-#
-# CVE-2025-4517
-#   Switch from Python 3.12.0 to 3.12.11
-#
-ENV PYTHON_VER=3.14.3
+ENV PYTHON_VER=3.14.4
 
 # set env vars needed to install MET with Python Embedding support
 
@@ -97,7 +93,20 @@ RUN \
      export CPPFLAGS="-I/usr/local/include" &&\
      export LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib" &&\
      python3 -m pip install --upgrade pip &&\
-     python3 -m pip install --no-binary :all: numpy==2.3.2 xarray==2025.1.2 netCDF4==1.7.2 "pandas>=2.3.3,<3" pyyaml==6.0.2 scipy==1.15.1) \
+     echo "install packages needed to build packages with no build isolation" &&\
+     python3 -m pip install "meson<1.11.0" "meson-python" "ninja" "cython>=3.0" "wheel" \
+                            "setuptools" "setuptools-scm" "hatchling" \
+                            "versioneer[toml]" "pythran" "pybind11" &&\
+     echo "install numpy first since it is needed to install other packages" &&\
+     python3 -m pip install --no-binary :all: --no-build-isolation \
+       numpy==2.3.2 &&\
+     python3 -m pip install --no-binary :all: --no-build-isolation \
+       xarray==2025.1.2 \
+       netCDF4==1.7.2 \
+       "pandas>=2.3.3,<3" \
+       pyyaml==6.0.2 \
+       scipy==1.15.1 \
+    ) \
  && echo "Running linker configuration" &&\
     ldconfig
 
