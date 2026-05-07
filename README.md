@@ -34,6 +34,12 @@ v3.5.0
 
 * Upgrade to Tomcat 10.1.48
 
+v3.4.10
+-------
+
+* Fixed bug installing pandas 2
+* Upgrade Python to 3.14.4
+
 v3.4.9
 ------
 
