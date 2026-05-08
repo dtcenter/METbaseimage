@@ -5,8 +5,8 @@ FROM ${BASE_REGISTRY}/${BASE_IMAGE}:${BASE_TAG}
 
 LABEL maintainer="George McCabe <mccabe@ucar.edu>"
 
-ARG MET_COMPILE_SCRIPT_BRANCH=feature_3389_zlib_sqlite
-ARG MET_TAR_FILE_VERSION_NAME=met-base-v3.5-met3389
+ARG MET_COMPILE_SCRIPT_BRANCH=develop
+ARG MET_TAR_FILE_VERSION_NAME=met-base-v3.5
 
 ENV PYTHON_VER=3.14.4
 
