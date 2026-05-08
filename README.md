@@ -8,6 +8,11 @@ Please see the [MET website](https://dtcenter.org/community-code/model-evaluatio
 Version History
 ===============
 
+v3.5.5
+------
+
+* Update versions for MET library dependencies
+
 v3.5.4
 ------
 
