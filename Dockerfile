@@ -6,7 +6,7 @@ FROM ${BASE_REGISTRY}/${BASE_IMAGE}:${BASE_TAG}
 LABEL maintainer="George McCabe <mccabe@ucar.edu>"
 
 ARG MET_COMPILE_SCRIPT_BRANCH=develop
-ARG MET_TAR_FILE_VERSION_NAME=met-base-develop
+ARG MET_TAR_FILE_VERSION_NAME=met-base-v3.5
 
 ENV PYTHON_VER=3.14.4
 
@@ -21,8 +21,6 @@ ENV FC=/usr/bin/gfortran
 ENV F77=/usr/bin/gfortran
 
 ENV GSFONT_URL=https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/ghostscript-fonts-std-8.11.tar.gz
-ENV ZLIB_URL=https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/zlib-1.3.1.tar.gz
-ENV SQLITE3_URL=https://www.sqlite.org/2025/sqlite-autoconf-3500300.tar.gz
 ENV MET_FONT_DIR=/usr/local/share/met/fonts
 
 WORKDIR /met
@@ -57,29 +55,6 @@ RUN \
      tk-dev unzip vim wget \
  && echo "Clean cache after installing system packages" &&\
     apt clean \
- && echo "Dowloading zlib from ${ZLIB_URL}" &&\
-    wget ${ZLIB_URL} &&\
-    tar xzf zlib-1.3.1.tar.gz &&\
-    (cd zlib-1.3.1 &&\
-    ./configure --enable-shared &&\
-    make -j `nproc` &&\
-    make install) \
- && echo "Downloading and installing sqlite3 from ${SQLITE3_URL}" &&\
-    wget ${SQLITE3_URL} &&\
-    filename=$(basename ${SQLITE3_URL}) &&\
-    tar xzf ${filename} &&\
-    (cd ${filename%%.*} && ./configure && make -j $(nproc) && make install) &&\
-    echo "/usr/local/lib" > /etc/ld.so.conf.d/usr-local.conf && ldconfig \
- && echo "Create dummy packages to prevent reinstallation of packages with CVEs" &&\
-    ( \
-        echo 'Package: libsqlite3-0'; \
-        echo 'Version: 9:9.9.9'; \
-        echo 'Architecture: amd64'; \
-        echo 'Maintainer: Dummy Pkg'; \
-        echo 'Description: Dummy package to satisfy libnss3 dependency with source-built sqlite3'; \
-    ) > /tmp/libsqlite3-0.control && \
-    equivs-build /tmp/libsqlite3-0.control &&\
-    dpkg -i libsqlite3-0_9.9.9_amd64.deb \
  && echo "Downloading GhostScript fonts from ${GSFONT_URL} into /usr/local/share/met" &&\
     mkdir -p /usr/local/share/met &&\
     curl -SL ${GSFONT_URL} | tar zxC /usr/local/share/met \
