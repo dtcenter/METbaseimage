@@ -100,32 +100,16 @@ RUN \
   && echo "Install Python packages" &&\
      pip install --upgrade pip &&\
      pip install PyMySQL\
-      attrs \
       cartopy \
       eofs \
-      exceptiongroup \
       imageio \
       imutils \
-      iniconfig \
       lxml \
       matplotlib \
       metpy \
       netCDF4 \
-      numpy \
-      opencv-python \
-      packaging \
       pandas \
-      pint \
-      pluggy \
       pytest \
-      python-dateutil \
-      pytz \
       pyyaml \
-      scikit-image \
-      scikit-learn \
       scipy \
-      setuptools \
-      six \
-      tomli \
-      wheel \
       xarray
