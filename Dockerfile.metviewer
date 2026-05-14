@@ -54,7 +54,7 @@ baseurl=https://mirror.stream.centos.org/9-stream/CRB/x86_64/os/\n\
 gpgcheck=0\n\
 enabled=1" > /etc/yum.repos.d/centos.repo &&\
      dnf clean all && dnf makecache &&\
-     dnf install -y --nodocs ant git gsl gsl-devel java-17-openjdk-headless mariadb-server &&\
+     dnf install -y --nodocs ant bzip2 git gsl gsl-devel java-17-openjdk-headless mariadb-server &&\
      dnf install -y xdg-utils flexiblas-devel libtirpc-devel &&\
      dnf install -y R-core R-core-devel &&\
      dnf clean all \
