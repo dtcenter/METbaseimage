@@ -9,7 +9,6 @@ source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
 #   $DOCKERHUB_UNIT_TEST_REPO is dtcenter/met-base-unit-test(-dev).
 #   $DOCKERHUB_METVIEWER_REPO is dtcenter/met-base-metviewer(-dev).
 #   $REGISTRY is Docker registry name -- IronBank or docker.io
-#   $DEBIAN_IMAGE is debian Docker image name -- IronBank or DockerHub
 #   $RHEL_IMAGE is RedHat UBI Docker image name -- IronBank or DockerHub
 #   $METPLUS_COMPONENT is component to build -- either met or metviewer
 
@@ -24,7 +23,7 @@ if [ "$METPLUS_COMPONENT" == "met" ]; then
 
     if ! time_command docker build -t ${DOCKERHUB_TAG_BASE} \
              --build-arg BASE_REGISTRY=${REGISTRY} \
-             --build-arg BASE_IMAGE=${DEBIAN_IMAGE} \
+             --build-arg BASE_IMAGE=${RHEL_IMAGE} \
              -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}; then
       echo "::group::${GITHUB_WORKSPACE}/docker_build_met_base_image.log"
       cat ${GITHUB_WORKSPACE}/docker_build_met_base_image.log

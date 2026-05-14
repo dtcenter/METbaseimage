@@ -1,6 +1,6 @@
 ARG BASE_REGISTRY=docker.io
-ARG BASE_IMAGE=debian
-ARG BASE_TAG=12-slim
+ARG BASE_IMAGE=redhat/ubi9
+ARG BASE_TAG=9.7
 FROM ${BASE_REGISTRY}/${BASE_IMAGE}:${BASE_TAG}
 
 LABEL maintainer="George McCabe <mccabe@ucar.edu>"
@@ -25,20 +25,6 @@ ENV MET_FONT_DIR=/usr/local/share/met/fonts
 
 WORKDIR /met
 
-#
-# - Remove packages containing Critical CVEs:
-#   NAME              INSTALLED               FIXED IN    TYPE VULNERABILITY  SEVERITY EPSS % RISK
-#   zlib1g-dev        1:1.2.13.dfsg-1         (won't fix) deb  CVE-2023-45853 Critical 70.89  0.6
-#   libopenexr-3-1-30 3.1.5-5                 (won't fix) deb  CVE-2023-5841  Critical 70.03  0.6
-#   libaom3           3.6.0-1+deb12u1         (won't fix) deb  CVE-2023-6879  Critical 37.08  0.1
-#   libxml2           2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49794 Critical 23.45  < 0.1
-#   libxml2           2.9.14+dfsg-1.3~deb12u2 (won't fix) deb  CVE-2025-49796 Critical 18.40  < 0.1
-#   libarchive13      3.6.2-1+deb12u2         (won't fix) deb  CVE-2025-5914  Critical 10.77  < 0.1
-#
-# - Install imagemagick after removal because it was removed as a dependency.
-#   Must install from source with some features like xml excluded because version from apt re-installs problematic
-#   packages that contain critical CVEs.
-
 RUN \
     echo "Set up the environment for interactive bash shell" &&\
     echo export MET_BASE=/usr/local/share/met >> /root/.bashrc &&\
@@ -47,14 +33,36 @@ RUN \
  && echo "Set soft limit to unlimited to prevent GRIB2 seg faults" &&\
     echo ulimit -S -s unlimited >> /root/.bashrc \
  && echo "Installing required system tools" &&\
-    apt update && apt -y upgrade &&\
-    apt install -y automake bison build-essential cmake curl equivs flex \
-     gfortran ghostscript git less libbz2-dev libc6-dev libcurl4-gnutls-dev \
-     libffi-dev libgdbm-dev libjpeg-dev libncursesw5-dev libopenblas-dev \
-     libpixman-1-dev libreadline-dev libssl-dev libtiff-dev m4 \
-     tk-dev unzip vim wget \
+    dnf upgrade -y --refresh --nodocs &&\
+    rpm --import https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-9 &&\
+    dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm &&\
+    /usr/bin/crb enable &&\
+    echo -e "[centos-baseos]\n\
+name=CentOS Stream 9 - BaseOS\n\
+baseurl=https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/\n\
+gpgcheck=0\n\
+enabled=1\n\
+\n\
+[centos-appstream]\n\
+name=CentOS Stream 9 - AppStream\n\
+baseurl=https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/\n\
+gpgcheck=0\n\
+enabled=1\n\
+\n\
+[centos-crb]\n\
+name=CentOS Stream 9 - CRB\n\
+baseurl=https://mirror.stream.centos.org/9-stream/CRB/x86_64/os/\n\
+gpgcheck=0\n\
+enabled=1" > /etc/yum.repos.d/centos.repo &&\
+    dnf clean all && dnf makecache &&\
+    dnf install -y \
+        automake bison cmake flex gfortran ghostscript git less \
+        libffi-devel libjpeg-turbo-devel ncurses-devel netcdf-devel pixman-devel \
+        readline-devel openssl-devel libtiff-devel m4 tk-devel \
+        unzip vim wget make gcc gcc-c++ bzip2-devel glibc-devel \
+        libcurl-devel gdbm-devel openblas-devel \
  && echo "Clean cache after installing system packages" &&\
-    apt clean \
+    dnf clean all \
  && echo "Downloading GhostScript fonts from ${GSFONT_URL} into /usr/local/share/met" &&\
     mkdir -p /usr/local/share/met &&\
     curl -SL ${GSFONT_URL} | tar zxC /usr/local/share/met \
@@ -92,8 +100,6 @@ RUN \
     ) \
  && echo "Running linker configuration" &&\
     ldconfig \
- && echo "Remove packages with CVEs" &&\
-    apt remove -y zlib1g-dev libopenexr-3-1-30 libaom3 libxml2 libarchive13 \
  && echo "Building ImageMagick without XML support" &&\
     wget https://github.com/ImageMagick/ImageMagick/archive/refs/tags/7.1.2-0.tar.gz &&\
     tar xzf 7.1.2-0.tar.gz &&\
