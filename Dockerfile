@@ -56,11 +56,12 @@ gpgcheck=0\n\
 enabled=1" > /etc/yum.repos.d/centos.repo &&\
     dnf clean all && dnf makecache &&\
     dnf install -y \
-        automake bison cmake flex gfortran ghostscript git less \
-        libffi-devel libjpeg-turbo-devel ncurses-devel netcdf-devel pixman-devel \
-        readline-devel openssl-devel libtiff-devel m4 tk-devel \
-        unzip vim wget make gcc gcc-c++ bzip2-devel glibc-devel \
-        libcurl-devel gdbm-devel openblas-devel \
+        automake bison cmake diffutils flex gfortran ghostscript git less \
+        libffi-devel libjpeg-turbo-devel ncurses-devel netcdf-devel \
+        pixman-devel readline-devel openssl-devel libtiff-devel m4 tk-devel \
+        unzip vim wget make \
+        gcc gcc-c++ \
+        bzip2-devel glibc-devel libcurl-devel gdbm-devel openblas-devel \
  && echo "Clean cache after installing system packages" &&\
     dnf clean all \
  && echo "Downloading GhostScript fonts from ${GSFONT_URL} into /usr/local/share/met" &&\
