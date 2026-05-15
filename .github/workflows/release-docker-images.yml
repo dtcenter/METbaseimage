@@ -27,7 +27,7 @@ env:
   DOCKERHUB_UNIT_TEST_REPO: dtcenter/met-base-unit-test
   DOCKERHUB_METVIEWER_REPO: dtcenter/met-base-metviewer
   REGISTRY: registry1.dso.mil
-  RHEL_IMAGE: ironbank/opensource/debian/debian
+  RHEL_IMAGE: ironbank/redhat/ubi/ubi9
 
 jobs:
 
