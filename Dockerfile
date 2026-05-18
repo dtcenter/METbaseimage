@@ -102,9 +102,9 @@ enabled=1" > /etc/yum.repos.d/centos.repo &&\
  && echo "Running linker configuration" &&\
     ldconfig \
  && echo "Building ImageMagick without XML support" &&\
-    wget https://github.com/ImageMagick/ImageMagick/archive/refs/tags/7.1.2-0.tar.gz &&\
-    tar xzf 7.1.2-0.tar.gz &&\
-    (cd ImageMagick-7.1.2-0 &&\
+    wget https://github.com/ImageMagick/ImageMagick/archive/refs/tags/7.1.2-23.tar.gz &&\
+    tar xzf 7.1.2-23.tar.gz &&\
+    (cd ImageMagick-7.1.2-23 &&\
     ./configure \
     --without-xml \
     --without-dps \
