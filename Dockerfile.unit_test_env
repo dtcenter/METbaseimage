@@ -20,9 +20,9 @@ RUN echo "Installing tools needed for running MET unit tests..." \
     dnf install -y xdg-utils flexiblas-devel libtirpc-devel &&\
     dnf install -y R-core R-core-devel &&\
     dnf clean all \
- && echo "Installing R ncdf4..." &&\
-    echo "r <- getOption('repos'); r['CRAN'] <- 'http://cran.us.r-project.org'; options(repos = r);" > ~/.Rprofile &&\
-    Rscript -e "install.packages('ncdf4', configure.args='--with-nc-config=/usr/local/bin/nc-config')" \
+ && echo "Installing R ncdf4 1.24..." &&\
+    wget https://cran.r-project.org/src/contrib/Archive/ncdf4/ncdf4_1.24.tar.gz &&\
+    R CMD INSTALL --configure-args="--with-nc-config=/usr/local/bin/nc-config" ncdf4_1.24.tar.gz \
  && echo "Installing udunits..." &&\
     dnf install -y udunits2-devel &&\
     echo "Downloading nco from ${NCO_URL}" \
