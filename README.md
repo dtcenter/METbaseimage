@@ -8,6 +8,16 @@ Please see the [MET website](https://dtcenter.org/community-code/model-evaluatio
 Version History
 ===============
 
+v3.5.5
+------
+
+* Update versions for MET library dependencies
+
+v3.5.4
+------
+
+* Upgrade Python to 3.14.4
+
 v3.5.3
 ------
 
@@ -28,6 +38,12 @@ v3.5.0
 ------
 
 * Upgrade to Tomcat 10.1.48
+
+v3.4.10
+-------
+
+* Fixed bug installing pandas 2
+* Upgrade Python to 3.14.4
 
 v3.4.9
 ------
