@@ -58,7 +58,7 @@ enabled=1" > /etc/yum.repos.d/centos.repo &&\
     dnf install -y \
         automake bison cmake diffutils flex gfortran ghostscript git less \
         libffi-devel libtirpc-devel ncurses-devel netcdf-devel \
-        pixman-devel readline-devel openssl-devel libtiff-devel m4 tk-devel \
+        pixman-devel readline-devel openssl-devel libtiff-devel m4 sqlite-devel tk-devel \
         unzip vim wget make \
         gcc gcc-c++ \
         bzip2-devel glibc-devel libcurl-devel gdbm-devel openblas-devel \
