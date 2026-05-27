@@ -1,6 +1,6 @@
 ARG BASE_REGISTRY=docker.io
 ARG BASE_IMAGE=redhat/ubi9
-ARG BASE_TAG=9.7
+ARG BASE_TAG=9.8
 FROM ${BASE_REGISTRY}/${BASE_IMAGE}:${BASE_TAG}
 
 LABEL maintainer="George McCabe <mccabe@ucar.edu>"
