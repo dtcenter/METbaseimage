@@ -9,7 +9,7 @@ WORKDIR /met
 
 ENV NCO_URL=https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/nco-5.3.3.tar.gz
 
-# - install Perl XML parser, R (with ncdf4) and NC tools
+# - install Perl XML parser and NC tools
 # - CVE-2024-32608
 #    Install nco 5.3.3 from source to avoid CVEs in HDF5 1.10.8 packages
 # - Remove packages containing Critical CVEs:
@@ -23,11 +23,6 @@ RUN echo "Installing tools needed for running MET unit tests..." \
  && echo "Installing Perl XML Parser..." \
  && apt update && apt -y upgrade \
  && apt install -y libxml-parser-perl \
- && echo "Installing R..." \
- && apt install -y r-base \
- && echo "Installing R ncdf4 1.21..." \
- && wget https://cran.r-project.org/src/contrib/Archive/ncdf4/ncdf4_1.21.tar.gz \
- && R CMD INSTALL --configure-args="--with-nc-config=/usr/local/bin/nc-config" ncdf4_1.21.tar.gz \
  && echo "Installing udunits..." \
  && apt install -y libudunits2-dev &&\
     echo "Downloading nco from ${NCO_URL}" \
