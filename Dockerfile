@@ -78,6 +78,7 @@ RUN \
     chmod +x compile_MET_all.sh &&\
     ./compile_MET_all.sh development.docker \
  && echo "Installing required Python packages" &&\
+    python3 -m pip install --upgrade pip setuptools wheel Cython meson-python &&\
     (export HDF5_DIR=/usr/local/ &&\
      export NETCDF4_DIR=/usr/local/ &&\
      export CPPFLAGS="-I/usr/local/include" &&\
@@ -85,10 +86,12 @@ RUN \
      python3 -m pip install --upgrade pip &&\
      python3 -m pip install --no-binary :all: \
        netCDF4~=1.7.4 \
-       numpy~=2.4.2 \
+       numpy~=2.4.6 \
        pandas~=3.0.3 \
+       python-dateutil~=2.9.0.post0 \
        pyyaml~=6.0.3 \
-       scipy~=1.17.0 \
+       scipy~=1.17.1 \
+       six~=1.17.0 \
        xarray~=2026.1.0 \
     ) \
  && echo "Running linker configuration" &&\
