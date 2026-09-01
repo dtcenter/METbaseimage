@@ -34,9 +34,9 @@ if [ "$METPLUS_COMPONENT" == "metviewer" ]; then
   time_command_exit docker push ${DOCKERHUB_TAG_METVIEWER}
 fi
 
-# For the release-docker-images.yml workflow, push X.Y-latest for vX.Y.Z versions
+# For the release-docker-images.yml workflow, push X.Y for vX.Y.Z versions
 if [[ "${UPDATE_LATEST}" == "true" && "${GITHUB_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  LATEST_TAG=$(echo ${GITHUB_NAME} | sed 's/^v//g' | cut -f1,2 -d'.')-latest
+  LATEST_TAG=$(echo ${GITHUB_NAME} | sed 's/^v//g' | cut -f1,2 -d'.')
 
   if [ "$METPLUS_COMPONENT" == "met" ]; then
     time_command_exit docker tag ${DOCKERHUB_TAG_BASE} ${DOCKERHUB_BASE_REPO}:${LATEST_TAG}
