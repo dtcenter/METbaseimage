@@ -8,6 +8,12 @@ Please see the [MET website](https://dtcenter.org/community-code/model-evaluatio
 Version History
 ===============
 
+v13.0
+-----
+
+* Update versioning to be consistent with other METplus components
+* Remove R from unit test image
+
 v3.5.5
 ------
 
