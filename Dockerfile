@@ -96,7 +96,7 @@ RUN \
      echo "install packages needed to build packages with no build isolation" &&\
      python3 -m pip install "meson<1.11.0" "meson-python" "ninja" "cython>=3.0" "wheel" \
                             "setuptools" "setuptools-scm" "hatchling" \
-                            "versioneer[toml]" "pythran" "pybind11" &&\
+                            "versioneer[toml]" "pythran" "pybind11" "patchelf" &&\
      echo "install numpy first since it is needed to install other packages" &&\
      python3 -m pip install --no-binary :all: --no-build-isolation \
        numpy==2.3.2 &&\
