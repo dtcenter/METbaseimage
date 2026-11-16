@@ -45,6 +45,16 @@ v3.5.0
 
 * Upgrade to Tomcat 10.1.48
 
+v3.4.12
+-------
+
+* Pin python-dateutil and six to fix build failure with python-dateutil 4.0.0
+
+v3.4.11
+-------
+
+* Install patchelf to fix scipy build failure with meson-python 0.22.0
+
 v3.4.10
 -------
 
