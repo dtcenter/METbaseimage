@@ -104,8 +104,10 @@ RUN \
        xarray==2025.1.2 \
        netCDF4==1.7.2 \
        "pandas>=2.3.3,<3" \
+       python-dateutil~=2.9.0.post0 \
        pyyaml==6.0.2 \
        scipy==1.15.1 \
+       six~=1.17.0 \
     ) \
  && echo "Running linker configuration" &&\
     ldconfig
