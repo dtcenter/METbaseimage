@@ -18,6 +18,13 @@ This file is the short form: the steps that are easy to miss. The guides are
 authoritative. Where this file and a guide genuinely conflict, say so in the
 pull request rather than silently following one.
 
+## Version history
+
+For each new release, add an entry under "Version History" in `README.md` on
+the `develop` branch, listing the changes in that version. This includes bugfix
+releases made from a `main_vX.Y` branch, so that `develop` keeps the complete
+history. Insert each entry in version order, newest first.
+
 ## Pull requests
 
 Fill in `.github/pull_request_template.md`. Change `- [ ]` to `- [x]` on every
